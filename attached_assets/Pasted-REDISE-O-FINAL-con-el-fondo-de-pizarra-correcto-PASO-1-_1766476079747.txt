@@ -1,0 +1,389 @@
+REDISEÑO FINAL con el fondo de pizarra correcto.
+
+PASO 1: Subir bg.png a public/
+
+Crea la carpeta public/bg/ si no existe y sube el archivo bg.png ahí.
+O copia el bg.png que está en tcf-brand-master/fondos/bg.png
+
+mkdir -p public/bg
+
+# Si tienes acceso al repo brand:
+git clone https://github.com/RUPERDFN/tcf-brand-master.git temp-brand
+cp temp-brand/fondos/bg.png public/bg/bg.png
+rm -rf temp-brand
+
+# También copia el logo
+mkdir -p public/brand
+cp temp-brand/logos/logo.PNG public/brand/logo.png
+
+PASO 2: ACTUALIZAR index.css con fondo correcto
+
+Reemplaza TODO src/index.css:
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Permanent+Marker&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply font-body text-white;
+    background: #1a1a1a;
+    background-image: url('/bg/bg.png');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    min-height: 100vh;
+  }
+
+  @media (max-width: 768px) {
+    body {
+      background-size: cover;
+      background-attachment: scroll;
+    }
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-chalk text-white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  h1 {
+    @apply text-5xl md:text-6xl;
+  }
+
+  h2 {
+    @apply text-4xl md:text-5xl;
+  }
+
+  h3 {
+    @apply text-3xl md:text-4xl;
+  }
+}
+
+@layer components {
+  /* Botón Siguiente - Verde con efecto pincelada */
+  .btn-siguiente {
+    @apply relative px-12 py-4 text-white font-bold text-xl;
+    background: linear-gradient(135deg, #5DB9A8 0%, #4db8a8 100%);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(93, 185, 168, 0.4);
+  }
+
+  .btn-siguiente:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(93, 185, 168, 0.6);
+  }
+
+  .btn-siguiente:active {
+    transform: translateY(0);
+  }
+
+  /* Botón outline blanco */
+  .btn-outline {
+    @apply px-8 py-4 text-white font-bold text-lg;
+    @apply border-2 border-white rounded-full;
+    @apply bg-transparent hover:bg-white hover:text-black;
+    @apply transition-all duration-300;
+  }
+
+  /* Input estilo TheCookFlow */
+  .input-tcf {
+    @apply w-full px-6 py-4 text-white border-2 border-white rounded-2xl;
+    @apply bg-black/30 backdrop-blur-sm;
+    @apply outline-none focus:border-accent-green focus:bg-black/50;
+    @apply transition-all text-lg;
+  }
+
+  .input-tcf::placeholder {
+    @apply text-gray-400;
+  }
+
+  /* Pills seleccionables */
+  .pill {
+    @apply px-6 py-3 border-2 border-white rounded-full text-white font-semibold;
+    @apply bg-transparent hover:bg-white hover:text-black cursor-pointer;
+    @apply transition-all duration-300;
+  }
+
+  .pill.selected {
+    @apply bg-white text-black;
+  }
+
+  /* Card container */
+  .card-tcf {
+    @apply bg-black/60 backdrop-blur-md p-8 rounded-3xl;
+    @apply border border-white/10;
+    @apply max-w-md w-full mx-auto;
+    @apply shadow-2xl;
+  }
+
+  /* Logo container */
+  .logo-container {
+    @apply flex items-center justify-center gap-3;
+  }
+
+  /* Número selector */
+  .number-selector {
+    @apply w-16 h-16 flex items-center justify-center;
+    @apply border-2 border-white rounded-xl text-2xl font-bold;
+    @apply cursor-pointer hover:bg-white hover:text-black transition-all;
+    @apply bg-black/40;
+  }
+
+  .number-selector.selected {
+    @apply bg-white text-black;
+  }
+
+  /* Círculo de alergia prohibido */
+  .allergen-circle {
+    @apply w-24 h-24 rounded-full border-4 border-red-500;
+    @apply flex items-center justify-center relative;
+    @apply bg-black/60 cursor-pointer;
+  }
+
+  .allergen-circle::after {
+    content: '';
+    @apply absolute w-28 h-1 bg-red-500;
+    transform: rotate(45deg);
+  }
+
+  /* Bottom Navigation */
+  .bottom-nav {
+    @apply fixed bottom-0 left-0 right-0;
+    @apply bg-black/80 backdrop-blur-md border-t-2 border-white/10;
+    @apply flex justify-around items-center h-20 px-4;
+  }
+
+  .nav-item {
+    @apply flex flex-col items-center gap-1 text-gray-400;
+    @apply hover:text-accent-green transition-colors cursor-pointer;
+    @apply py-2;
+  }
+
+  .nav-item.active {
+    @apply text-accent-green;
+  }
+
+  /* Progress bar para onboarding */
+  .progress-bar {
+    @apply h-2 bg-white/20 rounded-full overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-accent-green transition-all duration-500;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner {
+  @apply w-12 h-12 border-4 border-white/20 border-t-accent-green rounded-full;
+  animation: spin 1s linear infinite;
+}
+
+PASO 3: Landing.tsx mejorada
+
+Reemplaza src/pages/Landing.tsx:
+
+import { Link } from 'react-router-dom';
+
+export default function Landing() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+      {/* Logo con manzana */}
+      <div className="logo-container mb-12 fade-in">
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            {/* Puedes usar un emoji o el logo PNG real */}
+            <span className="text-7xl drop-shadow-lg">🍎</span>
+          </div>
+          <h1 className="text-6xl md:text-7xl font-chalk text-white">
+            The CookFlow
+          </h1>
+        </div>
+      </div>
+
+      {/* Título principal */}
+      <div className="text-center max-w-2xl mb-12 fade-in" style={{animationDelay: '0.2s'}}>
+        <h2 className="text-4xl md:text-5xl font-chalk text-white mb-6">
+          ¿Qué quieres comer esta semana?
+        </h2>
+        <p className="text-xl text-gray-300 font-body">
+          Tu chef personal con IA. Menús semanales personalizados y lista de compra automática.
+        </p>
+      </div>
+
+      {/* CTAs */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-16 fade-in" style={{animationDelay: '0.4s'}}>
+        <Link to="/register">
+          <button className="btn-siguiente">
+            Empezar gratis
+          </button>
+        </Link>
+        <Link to="/login">
+          <button className="btn-outline">
+            Ya tengo cuenta
+          </button>
+        </Link>
+      </div>
+
+      {/* Iconos decorativos */}
+      <div className="flex gap-8 fade-in" style={{animationDelay: '0.6s'}}>
+        <span className="text-6xl drop-shadow-lg filter hover:scale-110 transition-transform">🍅</span>
+        <span className="text-6xl drop-shadow-lg filter hover:scale-110 transition-transform">🥕</span>
+        <span className="text-6xl drop-shadow-lg filter hover:scale-110 transition-transform">🌶️</span>
+        <span className="text-6xl drop-shadow-lg filter hover:scale-110 transition-transform">🥒</span>
+      </div>
+    </div>
+  );
+}
+
+PASO 4: Actualizar OnboardingFlow.tsx con progress bar
+
+Reemplaza src/pages/onboarding/OnboardingFlow.tsx:
+
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useOnboardingStore } from '../../store/onboardingStore';
+import Step1Budget from './Step1Budget';
+import Step2Diners from './Step2Diners';
+// Import otros steps cuando los crees
+
+export default function OnboardingFlow() {
+  const currentStep = useOnboardingStore((state) => state.currentStep);
+  
+  const progressPercent = (currentStep / 8) * 100;
+  
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl">
+        {/* Progress bar */}
+        <div className="mb-8 fade-in">
+          <div className="progress-bar">
+            <div 
+              className="progress-fill"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          <p className="text-center text-white mt-3 font-semibold">
+            Paso {currentStep} de 8
+          </p>
+        </div>
+        
+        {/* Routes */}
+        <Routes>
+          <Route path="1" element={<Step1Budget />} />
+          <Route path="2" element={<Step2Diners />} />
+          {/* Añadir más routes para steps 3-8 */}
+          <Route path="*" element={<Navigate to="1" />} />
+        </Routes>
+      </div>
+    </div>
+  );
+}
+
+PASO 5: Step1Budget mejorado
+
+Reemplaza src/pages/onboarding/Step1Budget.tsx:
+
+import { useNavigate } from 'react-router-dom';
+import { useOnboardingStore } from '../../store/onboardingStore';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+
+export default function Step1Budget() {
+  const navigate = useNavigate();
+  const { budget_eur_week, setField } = useOnboardingStore();
+
+  const handleNext = () => {
+    if (budget_eur_week >= 30 && budget_eur_week <= 500) {
+      navigate('/onboarding/2');
+    }
+  };
+
+  return (
+    <div className="card-tcf fade-in">
+      {/* Logo pequeño en header */}
+      <div className="text-center mb-8">
+        <span className="text-5xl mb-2 block">🍎</span>
+        <h3 className="text-2xl font-chalk">The CookFlow</h3>
+      </div>
+
+      {/* Pregunta principal */}
+      <h2 className="text-3xl md:text-4xl font-chalk text-center mb-8">
+        Presupuesto semanal
+      </h2>
+
+      <p className="text-gray-300 text-center mb-6">
+        ¿Cuánto quieres gastar en comida esta semana?
+      </p>
+
+      {/* Input */}
+      <div className="mb-8">
+        <Input
+          type="number"
+          placeholder="Ej: 50€"
+          value={budget_eur_week || ''}
+          onChange={(e) => setField('budget_eur_week', parseInt(e.target.value) || 0)}
+          min={30}
+          max={500}
+        />
+        <p className="text-gray-400 text-sm mt-2 text-center">
+          Entre 30€ y 500€ por semana
+        </p>
+      </div>
+
+      {/* Botón Siguiente */}
+      <div className="flex justify-center">
+        <Button 
+          onClick={handleNext} 
+          disabled={budget_eur_week < 30 || budget_eur_week > 500}
+          className={budget_eur_week < 30 || budget_eur_week > 500 ? 'opacity-50 cursor-not-allowed' : ''}
+        >
+          Siguiente
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+VERIFICACIÓN:
+1. El fondo debe mostrar la textura de pizarra (bg.png)
+2. Logo manzana 🍎 + "The CookFlow" en blanco
+3. Botón "Siguiente" verde redondeado
+4. Inputs con borde blanco redondeado y fondo semi-transparente
+5. Cards con fondo semi-transparente oscuro
+6. Progress bar funcionando (verde)
+
+Commit: "feat: apply real chalkboard design with bg texture"

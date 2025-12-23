@@ -3,46 +3,12 @@
 @theme inline {
   --font-chalk: 'Permanent Marker', cursive;
   --font-body: 'Nunito', sans-serif;
-
-  --color-chalk-white: #F8F8F8;
-  --color-chalk-cream: #FFF8E7;
-  
-  --color-chalkboard-dark: #1A1A1A;
-  --color-chalkboard-medium: #2D2D2D;
-  --color-chalkboard-light: #404040;
-  
   --color-accent-green: #5DB9A8;
-  --color-accent-red: #E74C3C;
-  --color-accent-yellow: #F39C12;
-  --color-accent-orange: #E67E22;
-
-  --shadow-chalk: 2px 2px 0 rgba(255, 255, 255, 0.3);
-  --shadow-chalk-lg: 4px 4px 0 rgba(255, 255, 255, 0.3);
-
-  /* Shadcn Semantic Mapping */
-  --color-background: var(--color-chalkboard-dark);
-  --color-foreground: var(--color-chalk-white);
-  --color-primary: var(--color-accent-green);
-  --color-primary-foreground: var(--color-chalkboard-dark);
-  --color-secondary: var(--color-chalkboard-light);
-  --color-secondary-foreground: var(--color-chalk-white);
-  --color-card: var(--color-chalkboard-medium);
-  --color-card-foreground: var(--color-chalk-white);
-  --color-muted: var(--color-chalkboard-light);
-  --color-muted-foreground: #a0a0a0;
-  --color-accent: var(--color-accent-green);
-  --color-accent-foreground: var(--color-chalkboard-dark);
-  --color-destructive: var(--color-accent-red);
-  --color-destructive-foreground: var(--color-chalk-white);
-  --color-border: var(--color-chalkboard-light);
-  --color-input: var(--color-chalkboard-light);
-  --color-ring: var(--color-accent-green);
-  --radius: 0.5rem;
 }
 
-/* Emulate the user's @font-face request by mapping the name to our loaded Google Font */
+/* Emulate the user's font request */
 @font-face {
-  font-family: 'Cheveuxdange';
+  font-family: 'Permanent Marker';
   src: local('Permanent Marker'), url('https://fonts.gstatic.com/s/permanentmarker/v16/Fh4uPib9Iyv2ucM6pGQMWimMp004La2C.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
@@ -53,13 +19,12 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    @apply border-border;
   }
 
   body {
-    @apply font-body text-chalk-white;
-    background-color: #1A1A1A;
-    background-image: url('/brand/bg-chalkboard.png');
+    @apply font-body text-white;
+    background: #1a1a1a;
+    background-image: url('/bg/bg.png');
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
@@ -68,14 +33,14 @@
 
   @media (max-width: 768px) {
     body {
-      background-size: contain;
-      background-repeat: repeat-y;
+      background-size: cover;
+      background-attachment: scroll;
     }
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-chalk;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    @apply font-chalk text-white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   }
 
   h1 {
@@ -92,77 +57,131 @@
 }
 
 @layer components {
-  .btn-primary {
-    @apply bg-accent-green text-chalkboard-dark font-chalk text-xl px-8 py-4 rounded-xl;
-    @apply shadow-[3px_3px_0_rgba(248,248,248,0.3)] hover:shadow-[5px_5px_0_rgba(248,248,248,0.3)];
-    @apply transition-all duration-200 hover:translate-x-[-2px] hover:translate-y-[-2px] cursor-pointer;
-    @apply border-2 border-chalk-white/20;
-  }
-  
-  .btn-secondary {
-    @apply border-2 border-chalk-white text-chalk-white font-chalk text-xl px-8 py-4 rounded-xl;
-    @apply bg-chalkboard-medium/50 backdrop-blur-sm;
-    @apply hover:bg-chalk-white/10 transition-all duration-200 cursor-pointer;
-    @apply shadow-[2px_2px_0_rgba(248,248,248,0.2)];
-  }
-  
-  .card-chalk {
-    @apply bg-chalkboard-medium/80 backdrop-blur-sm rounded-2xl p-8;
-    @apply border-2 border-chalkboard-light;
-    @apply shadow-[4px_4px_0_rgba(0,0,0,0.3)];
-  }
-  
-  .input-chalk {
-    @apply bg-chalkboard-light/50 backdrop-blur-sm;
-    @apply border-2 border-chalkboard-light text-chalk-white;
-    @apply px-4 py-3 rounded-lg outline-none;
-    @apply focus:border-accent-green focus:ring-2 focus:ring-accent-green/30;
-    @apply transition-all duration-200;
-    @apply font-body text-lg w-full;
+  /* Botón Siguiente - Verde con efecto pincelada */
+  .btn-siguiente {
+    @apply relative px-12 py-4 text-white font-bold text-xl;
+    background: linear-gradient(135deg, #5DB9A8 0%, #4db8a8 100%);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(93, 185, 168, 0.4);
   }
 
-  .input-chalk::placeholder {
-    @apply text-chalk-white/40;
+  .btn-siguiente:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(93, 185, 168, 0.6);
+  }
+
+  .btn-siguiente:active {
+    transform: translateY(0);
+  }
+
+  .btn-siguiente:disabled {
+    @apply opacity-50 cursor-not-allowed shadow-none transform-none;
+  }
+
+  /* Botón outline blanco */
+  .btn-outline {
+    @apply px-8 py-4 text-white font-bold text-lg;
+    @apply border-2 border-white rounded-full;
+    @apply bg-transparent hover:bg-white hover:text-black;
+    @apply transition-all duration-300 cursor-pointer;
+  }
+
+  /* Input estilo TheCookFlow */
+  .input-tcf {
+    @apply w-full px-6 py-4 text-white border-2 border-white rounded-2xl;
+    @apply bg-black/30 backdrop-blur-sm;
+    @apply outline-none focus:border-accent-green focus:bg-black/50;
+    @apply transition-all text-lg;
+  }
+
+  .input-tcf::placeholder {
+    @apply text-gray-400;
+  }
+
+  /* Pills seleccionables */
+  .pill {
+    @apply px-6 py-3 border-2 border-white rounded-full text-white font-semibold;
+    @apply bg-transparent hover:bg-white hover:text-black cursor-pointer;
+    @apply transition-all duration-300;
+  }
+
+  .pill.selected {
+    @apply bg-white text-black;
+  }
+
+  /* Card container */
+  .card-tcf {
+    @apply bg-black/60 backdrop-blur-md p-8 rounded-3xl;
+    @apply border border-white/10;
+    @apply max-w-md w-full mx-auto;
+    @apply shadow-2xl;
+  }
+
+  /* Logo container */
+  .logo-container {
+    @apply flex items-center justify-center gap-3;
+  }
+
+  /* Número selector */
+  .number-selector {
+    @apply w-16 h-16 flex items-center justify-center;
+    @apply border-2 border-white rounded-xl text-2xl font-bold;
+    @apply cursor-pointer hover:bg-white hover:text-black transition-all;
+    @apply bg-black/40;
+  }
+
+  .number-selector.selected {
+    @apply bg-white text-black;
+  }
+
+  /* Círculo de alergia prohibido */
+  .allergen-circle {
+    @apply w-24 h-24 rounded-full border-4 border-red-500;
+    @apply flex items-center justify-center relative;
+    @apply bg-black/60 cursor-pointer;
+  }
+
+  .allergen-circle::after {
+    content: '';
+    @apply absolute w-28 h-1 bg-red-500;
+    transform: rotate(45deg);
+  }
+
+  /* Bottom Navigation */
+  .bottom-nav {
+    @apply fixed bottom-0 left-0 right-0;
+    @apply bg-black/80 backdrop-blur-md border-t-2 border-white/10;
+    @apply flex justify-around items-center h-20 px-4;
   }
 
   .nav-item {
-    @apply flex flex-col items-center gap-1 text-chalk-white/60;
-    @apply hover:text-accent-green transition-colors duration-200;
+    @apply flex flex-col items-center gap-1 text-gray-400;
+    @apply hover:text-accent-green transition-colors cursor-pointer;
+    @apply py-2;
   }
 
   .nav-item.active {
     @apply text-accent-green;
   }
 
+  /* Progress bar para onboarding */
   .progress-bar {
-    @apply h-2 bg-chalkboard-light rounded-full overflow-hidden;
+    @apply h-2 bg-white/20 rounded-full overflow-hidden;
   }
 
   .progress-fill {
     @apply h-full bg-accent-green transition-all duration-500;
-    @apply shadow-[0_0_10px_rgba(93,185,168,0.5)];
-  }
-
-  .food-icon {
-    @apply w-16 h-16 object-contain filter drop-shadow-[2px_2px_4px_rgba(0,0,0,0.5)];
-  }
-
-  .chalk-text {
-    @apply font-chalk text-chalk-white;
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
-  }
-
-  .loading-spinner {
-    @apply animate-spin rounded-full border-4 border-chalkboard-light;
-    @apply border-t-accent-green w-12 h-12;
   }
 }
 
-/* Animaciones personalizadas */
-@keyframes chalkWrite {
+/* Animaciones */
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -170,24 +189,18 @@
   }
 }
 
-.animate-chalk-write {
-  animation: chalkWrite 0.5s ease-out forwards;
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
 }
 
-/* Scrollbar personalizado */
-::-webkit-scrollbar {
-  width: 12px;
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: #2D2D2D;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #5DB9A8;
-  border-radius: 6px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #4db8a8;
+.loading-spinner {
+  @apply w-12 h-12 border-4 border-white/20 border-t-accent-green rounded-full;
+  animation: spin 1s linear infinite;
 }
