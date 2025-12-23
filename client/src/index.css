@@ -4,61 +4,62 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-display: "Architects Daughter", cursive;
-  --font-sans: "Inter", sans-serif;
+  --font-display: "Permanent Marker", cursive;
+  --font-sans: "Nunito", sans-serif;
 
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
+  /* Color Palette from PASO 4 */
+  --color-chalk-white: #F8F8F8;
+  --color-chalk-cream: #FFF8E7;
+  
+  --color-chalkboard-dark: #1A1A1A;
+  --color-chalkboard-medium: #2D2D2D;
+  --color-chalkboard-light: #404040;
+  
+  --color-accent-green: #5DB9A8;
+  --color-accent-red: #E74C3C;
+  --color-accent-yellow: #F39C12;
+  --color-accent-orange: #E67E22;
+
+  /* Map to semantic variables for Shadcn/UI compatibility */
+  --color-background: var(--color-chalkboard-dark);
+  --color-foreground: var(--color-chalk-white);
+  
+  --color-card: var(--color-chalkboard-medium);
+  --color-card-foreground: var(--color-chalk-white);
+  
+  --color-popover: var(--color-chalkboard-medium);
+  --color-popover-foreground: var(--color-chalk-white);
+  
+  --color-primary: var(--color-accent-green);
+  --color-primary-foreground: var(--color-chalkboard-dark);
+  
+  --color-secondary: var(--color-chalkboard-light);
+  --color-secondary-foreground: var(--color-chalk-white);
+  
+  --color-muted: var(--color-chalkboard-light);
+  --color-muted-foreground: #a0a0a0;
+  
+  --color-accent: var(--color-accent-green);
+  --color-accent-foreground: var(--color-chalkboard-dark);
+  
+  --color-destructive: var(--color-accent-red);
+  --color-destructive-foreground: var(--color-chalk-white);
+
+  --color-border: var(--color-chalkboard-light);
+  --color-input: var(--color-chalkboard-light);
+  --color-ring: var(--color-accent-green);
+  
+  --radius: 0.5rem;
 }
 
 :root {
-  /* Chalkboard Palette */
-  --background: 210 10% 20%; /* Dark Slate */
-  --foreground: 0 0% 95%; /* Chalk White */
-  
-  --card: 210 10% 25%; /* Slightly lighter slate */
-  --card-foreground: 0 0% 95%;
-  
-  --popover: 210 10% 25%;
-  --popover-foreground: 0 0% 95%;
-  
-  --primary: 150 60% 70%; /* Pastel Chalk Green */
-  --primary-foreground: 210 10% 20%;
-  
-  --secondary: 210 10% 30%;
-  --secondary-foreground: 0 0% 95%;
-  
-  --muted: 210 10% 30%;
-  --muted-foreground: 210 10% 70%;
-  
-  --accent: 330 70% 70%; /* Pastel Chalk Pink */
-  --accent-foreground: 210 10% 20%;
-  
-  --destructive: 0 60% 70%; /* Pastel Chalk Red */
-  --destructive-foreground: 0 0% 95%;
-
-  --border: 0 0% 100% / 0.2; /* Transparent White Chalk Line */
-  --input: 210 10% 30%;
-  --ring: 150 60% 70%;
-  
-  --radius: 0.5rem;
+  /* No need to redefine here if using @theme inline for v4 variables, 
+     but keeping semantic mapping for shadcn components that might use hsl() */
+     
+  /* Redefining these as raw values might be needed if Shadcn uses HSL specifically.
+     For now, we rely on the @theme mapping above which binds the hex values to the semantic names.
+     If Shadcn components break because they expect HSL, we will convert.
+  */
 }
 
 @layer base {
@@ -67,11 +68,31 @@
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    /* Background handled in Layout component for reliable asset loading */
+    /* Chalkboard texture SVG pattern */
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%231A1A1A" width="100" height="100"/><g fill-opacity="0.03"><circle fill="%23FFF" cx="50" cy="50" r="2"/></g></svg>');
+    background-size: 100px 100px;
   }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-accent-green text-chalkboard-dark font-display px-6 py-3 rounded-lg shadow-lg hover:bg-accent-green/90 transition-all cursor-pointer;
+  }
+  
+  .btn-secondary {
+    @apply border-2 border-chalk-white text-chalk-white font-display px-6 py-3 rounded-lg hover:bg-chalk-white/10 transition-all cursor-pointer;
+  }
+  
+  .card-chalk {
+    @apply bg-card rounded-xl p-6 shadow-xl border border-border;
+  }
+  
+  .input-chalk {
+    @apply bg-secondary border-2 border-secondary focus:border-accent-green text-chalk-white px-4 py-3 rounded-lg outline-none transition-all w-full placeholder:text-white/30;
   }
 }
 

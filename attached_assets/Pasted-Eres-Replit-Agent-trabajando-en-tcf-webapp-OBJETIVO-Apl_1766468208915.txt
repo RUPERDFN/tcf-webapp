@@ -1,0 +1,838 @@
+Eres Replit Agent trabajando en tcf-webapp.
+
+OBJETIVO: Aplicación web React completa con 20 pantallas para TheCookFlow.
+
+CONTEXTO:
+- React 18 + Vite + TypeScript
+- Estética "Chalkboard" con colores pizarra
+- Onboarding 8 pasos → generación menú → dashboard
+- Integración con tcf-api y tcf-skinchef
+- JWT auth + localStorage
+- Premium gating (funciones limitadas para free users)
+
+PASO 1: PACKAGE.JSON
+{
+  "name": "tcf-webapp",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.21.1",
+    "zustand": "^4.4.7",
+    "axios": "^1.6.5",
+    "zod": "^3.22.4",
+    "framer-motion": "^10.18.0",
+    "lucide-react": "^0.303.0",
+    "react-hot-toast": "^2.4.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.47",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11",
+    "tailwindcss": "^3.4.1",
+    "postcss": "^8.4.33",
+    "autoprefixer": "^10.4.16"
+  }
+}
+
+PASO 2: VITE.CONFIG.TS
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    host: '0.0.0.0',
+    port: 5173
+  }
+});
+
+PASO 3: TSCONFIG.JSON
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
+
+PASO 4: TAILWIND.CONFIG.JS
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        chalk: {
+          white: '#F8F8F8',
+          cream: '#FFF8E7',
+        },
+        chalkboard: {
+          dark: '#1A1A1A',
+          medium: '#2D2D2D',
+          light: '#404040',
+        },
+        accent: {
+          green: '#5DB9A8',
+          red: '#E74C3C',
+          yellow: '#F39C12',
+          orange: '#E67E22',
+        },
+      },
+      fontFamily: {
+        chalk: ['ChVN', 'Permanent Marker', 'cursive'],
+        body: ['Nunito', 'Arial', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [],
+}
+
+PASO 5: INDEX.HTML
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TheCookFlow - Tu Chef Personal IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>
+
+PASO 6: ESTRUCTURA DE CARPETAS
+src/
+├── main.tsx
+├── App.tsx
+├── index.css
+├── components/
+│   ├── layout/
+│   │   ├── Header.tsx
+│   │   ├── Footer.tsx
+│   │   └── BottomNav.tsx
+│   ├── ui/
+│   │   ├── Button.tsx
+│   │   ├── Input.tsx
+│   │   ├── Card.tsx
+│   │   └── LoadingSpinner.tsx
+│   └── modals/
+│       ├── PremiumModal.tsx
+│       └── ConfirmModal.tsx
+├── pages/
+│   ├── Landing.tsx
+│   ├── auth/
+│   │   ├── Login.tsx
+│   │   └── Register.tsx
+│   ├── onboarding/
+│   │   ├── OnboardingFlow.tsx
+│   │   ├── Step1Budget.tsx
+│   │   ├── Step2Diners.tsx
+│   │   ├── Step3Meals.tsx
+│   │   ├── Step4Days.tsx
+│   │   ├── Step5Diet.tsx
+│   │   ├── Step6Allergies.tsx
+│   │   ├── Step7Favorites.tsx
+│   │   └── Step8Pantry.tsx
+│   ├── generation/
+│   │   ├── Loading.tsx
+│   │   └── Success.tsx
+│   └── dashboard/
+│       ├── DashboardLayout.tsx
+│       ├── Home.tsx
+│       ├── ShoppingList.tsx
+│       ├── Achievements.tsx
+│       └── Profile.tsx
+├── store/
+│   ├── authStore.ts
+│   ├── onboardingStore.ts
+│   └── dashboardStore.ts
+├── lib/
+│   ├── api.ts
+│   └── validation.ts
+└── types/
+    └── index.ts
+
+PASO 7: SRC/INDEX.CSS
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-chalkboard-dark text-chalk-white font-body;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%231A1A1A" width="100" height="100"/><g fill-opacity="0.03"><circle fill="%23FFF" cx="50" cy="50" r="2"/></g></svg>');
+    background-size: 100px 100px;
+  }
+  
+  h1, h2, h3, h4 {
+    @apply font-chalk;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-accent-green text-chalkboard-dark font-chalk px-6 py-3 rounded-lg shadow-lg hover:bg-accent-green/90 transition-all;
+  }
+  
+  .btn-secondary {
+    @apply border-2 border-chalk-white text-chalk-white font-chalk px-6 py-3 rounded-lg hover:bg-chalk-white/10 transition-all;
+  }
+  
+  .card-chalk {
+    @apply bg-chalkboard-medium rounded-xl p-6 shadow-xl border border-chalkboard-light;
+  }
+  
+  .input-chalk {
+    @apply bg-chalkboard-light border-2 border-chalkboard-light focus:border-accent-green text-chalk-white px-4 py-3 rounded-lg outline-none transition-all;
+  }
+}
+
+PASO 8: SRC/MAIN.TSX
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import './index.css';
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);
+
+PASO 9: SRC/APP.TSX
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { useAuthStore } from './store/authStore';
+
+// Pages
+import Landing from './pages/Landing';
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+import OnboardingFlow from './pages/onboarding/OnboardingFlow';
+import Loading from './pages/generation/Loading';
+import Success from './pages/generation/Success';
+import DashboardLayout from './pages/dashboard/DashboardLayout';
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Toaster position="top-center" />
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        
+        <Route path="/onboarding/*" element={
+          <ProtectedRoute>
+            <OnboardingFlow />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/loading" element={
+          <ProtectedRoute>
+            <Loading />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/success" element={
+          <ProtectedRoute>
+            <Success />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/dashboard/*" element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        } />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+
+PASO 10: IMPLEMENTAR STORES (Zustand)
+
+src/store/authStore.ts:
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+interface User {
+  id: string;
+  email: string;
+}
+
+interface AuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  login: (user: User, token: string) => void;
+  logout: () => void;
+}
+
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      token: null,
+      isAuthenticated: false,
+      login: (user, token) => set({ user, token, isAuthenticated: true }),
+      logout: () => set({ user: null, token: null, isAuthenticated: false }),
+    }),
+    {
+      name: 'auth-storage',
+    }
+  )
+);
+
+src/store/onboardingStore.ts:
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+interface OnboardingState {
+  currentStep: number;
+  budget_eur_week: number;
+  diners: number;
+  meals_per_day: number;
+  days: number;
+  diet_type: string;
+  allergies: string[];
+  favorite_foods: string[];
+  disliked_foods: string[];
+  pantry_items: string;
+  setField: (field: string, value: any) => void;
+  nextStep: () => void;
+  prevStep: () => void;
+  reset: () => void;
+}
+
+export const useOnboardingStore = create<OnboardingState>()(
+  persist(
+    (set) => ({
+      currentStep: 1,
+      budget_eur_week: 50,
+      diners: 2,
+      meals_per_day: 2,
+      days: 5,
+      diet_type: 'omnivora',
+      allergies: [],
+      favorite_foods: [],
+      disliked_foods: [],
+      pantry_items: '',
+      setField: (field, value) => set({ [field]: value }),
+      nextStep: () => set((state) => ({ currentStep: state.currentStep + 1 })),
+      prevStep: () => set((state) => ({ currentStep: state.currentStep - 1 })),
+      reset: () => set({
+        currentStep: 1,
+        budget_eur_week: 50,
+        diners: 2,
+        meals_per_day: 2,
+        days: 5,
+        diet_type: 'omnivora',
+        allergies: [],
+        favorite_foods: [],
+        disliked_foods: [],
+        pantry_items: '',
+      }),
+    }),
+    {
+      name: 'onboarding-storage',
+    }
+  )
+);
+
+PASO 11: API CLIENT
+
+src/lib/api.ts:
+import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const CHEF_BASE_URL = import.meta.env.VITE_CHEF_BASE_URL || 'http://localhost:8000';
+
+export const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+export const chefClient = axios.create({
+  baseURL: CHEF_BASE_URL,
+});
+
+// Interceptor para añadir token JWT
+apiClient.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Auth API
+export const authAPI = {
+  register: (email: string, password: string) =>
+    apiClient.post('/api/auth/register', { email, password }),
+  login: (email: string, password: string) =>
+    apiClient.post('/api/auth/login', { email, password }),
+};
+
+// Profile API
+export const profileAPI = {
+  get: () => apiClient.get('/api/profile'),
+  update: (data: any) => apiClient.put('/api/profile', data),
+};
+
+// Menu API
+export const menuAPI = {
+  generate: (profile: any, days: number) => 
+    chefClient.post('/menu/generate', { 
+      user_id: useAuthStore.getState().user?.id,
+      profile, 
+      days 
+    }),
+  save: (menuData: any) => apiClient.post('/api/menus', menuData),
+  getLatest: () => apiClient.get('/api/menus/latest'),
+  getHistory: () => apiClient.get('/api/menus/history'),
+};
+
+// Shopping API
+export const shoppingAPI = {
+  save: (data: any) => apiClient.post('/api/shopping', data),
+  getLatest: () => apiClient.get('/api/shopping/latest'),
+};
+
+// Achievements API
+export const achievementsAPI = {
+  getAll: () => apiClient.get('/api/achievements'),
+  getUserAchievements: () => apiClient.get('/api/achievements/user'),
+};
+
+// Stats API
+export const statsAPI = {
+  get: () => apiClient.get('/api/stats'),
+};
+
+PASO 12: COMPONENTES UI BÁSICOS
+
+src/components/ui/Button.tsx:
+import { ButtonHTMLAttributes } from 'react';
+
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary';
+  children: React.ReactNode;
+}
+
+export default function Button({ variant = 'primary', children, className = '', ...props }: ButtonProps) {
+  const baseClass = variant === 'primary' ? 'btn-primary' : 'btn-secondary';
+  return (
+    <button className={`${baseClass} ${className}`} {...props}>
+      {children}
+    </button>
+  );
+}
+
+src/components/ui/Input.tsx:
+import { InputHTMLAttributes } from 'react';
+
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+}
+
+export default function Input({ label, className = '', ...props }: InputProps) {
+  return (
+    <div className="flex flex-col gap-2">
+      {label && <label className="text-chalk-white font-semibold">{label}</label>}
+      <input className={`input-chalk ${className}`} {...props} />
+    </div>
+  );
+}
+
+PASO 13: PÁGINAS PRINCIPALES (Versiones simplificadas - ampliarás después)
+
+src/pages/Landing.tsx:
+import { Link } from 'react-router-dom';
+import Button from '../components/ui/Button';
+
+export default function Landing() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-8">
+      <h1 className="text-6xl mb-6 text-center">TheCookFlow</h1>
+      <p className="text-2xl text-chalk-cream mb-12 text-center max-w-2xl">
+        Tu chef personal con IA. Menús semanales + lista de compra en 2 minutos.
+      </p>
+      <div className="flex gap-4">
+        <Link to="/register">
+          <Button variant="primary">Empezar Gratis</Button>
+        </Link>
+        <Link to="/login">
+          <Button variant="secondary">Ya tengo cuenta</Button>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+src/pages/auth/Login.tsx:
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuthStore } from '../../store/authStore';
+import { authAPI } from '../../lib/api';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import toast from 'react-hot-toast';
+
+export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const response = await authAPI.login(email, password);
+      login(response.data.user, response.data.token);
+      toast.success('¡Bienvenido!');
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Error al iniciar sesión');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="card-chalk w-full max-w-md">
+        <h2 className="text-4xl mb-6 text-center">Iniciar Sesión</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Input
+            type="email"
+            label="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <Input
+            type="password"
+            label="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? 'Cargando...' : 'Entrar'}
+          </Button>
+        </form>
+        <p className="text-center mt-4">
+          ¿No tienes cuenta? <Link to="/register" className="text-accent-green">Regístrate</Link>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+src/pages/auth/Register.tsx:
+// Similar estructura a Login pero con authAPI.register
+
+src/pages/onboarding/OnboardingFlow.tsx:
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useOnboardingStore } from '../../store/onboardingStore';
+import Step1Budget from './Step1Budget';
+import Step2Diners from './Step2Diners';
+// Import otros steps...
+
+export default function OnboardingFlow() {
+  const currentStep = useOnboardingStore((state) => state.currentStep);
+  
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl">
+        <div className="mb-8">
+          <div className="flex justify-between mb-2">
+            {[1,2,3,4,5,6,7,8].map((step) => (
+              <div
+                key={step}
+                className={`h-2 flex-1 mx-1 rounded ${
+                  step <= currentStep ? 'bg-accent-green' : 'bg-chalkboard-light'
+                }`}
+              />
+            ))}
+          </div>
+          <p className="text-center text-chalk-cream">Paso {currentStep} de 8</p>
+        </div>
+        
+        <Routes>
+          <Route path="1" element={<Step1Budget />} />
+          <Route path="2" element={<Step2Diners />} />
+          {/* Más routes... */}
+          <Route path="*" element={<Navigate to="1" />} />
+        </Routes>
+      </div>
+    </div>
+  );
+}
+
+src/pages/onboarding/Step1Budget.tsx:
+import { useNavigate } from 'react-router-dom';
+import { useOnboardingStore } from '../../store/onboardingStore';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+
+export default function Step1Budget() {
+  const navigate = useNavigate();
+  const { budget_eur_week, setField } = useOnboardingStore();
+
+  const handleNext = () => {
+    if (budget_eur_week >= 30 && budget_eur_week <= 500) {
+      navigate('/onboarding/2');
+    }
+  };
+
+  return (
+    <div className="card-chalk">
+      <h2 className="text-4xl mb-4">¿Cuál es tu presupuesto semanal?</h2>
+      <p className="text-chalk-cream mb-6">
+        Indica cuánto quieres gastar en comida cada semana (30-500€)
+      </p>
+      <Input
+        type="number"
+        label="Presupuesto (€)"
+        value={budget_eur_week}
+        onChange={(e) => setField('budget_eur_week', parseInt(e.target.value))}
+        min={30}
+        max={500}
+      />
+      <div className="flex justify-end mt-6">
+        <Button onClick={handleNext}>Siguiente</Button>
+      </div>
+    </div>
+  );
+}
+
+// Implementar Steps 2-8 similar estructura con campos específicos
+
+src/pages/generation/Loading.tsx:
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useOnboardingStore } from '../../store/onboardingStore';
+import { useAuthStore } from '../../store/authStore';
+import { menuAPI, shoppingAPI } from '../../lib/api';
+import toast from 'react-hot-toast';
+
+export default function Loading() {
+  const navigate = useNavigate();
+  const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState('Analizando tus preferencias...');
+  const onboardingData = useOnboardingStore();
+  const userId = useAuthStore((state) => state.user?.id);
+
+  useEffect(() => {
+    generateMenu();
+  }, []);
+
+  const generateMenu = async () => {
+    try {
+      // Progreso simulado
+      const progressInterval = setInterval(() => {
+        setProgress((prev) => Math.min(prev + 10, 90));
+      }, 500);
+
+      // Step 1: Generar menú con IA
+      setStatus('Generando tu menú personalizado...');
+      const menuResponse = await menuAPI.generate({
+        budget_eur_week: onboardingData.budget_eur_week,
+        diners: onboardingData.diners,
+        meals_per_day: onboardingData.meals_per_day,
+        days: onboardingData.days,
+        diet_type: onboardingData.diet_type,
+        allergies: onboardingData.allergies,
+        favorite_foods: onboardingData.favorite_foods,
+        disliked_foods: onboardingData.disliked_foods,
+        pantry_items: onboardingData.pantry_items,
+      }, onboardingData.days);
+
+      // Step 2: Guardar menú en BD
+      setStatus('Guardando tu menú...');
+      await menuAPI.save({
+        days: onboardingData.days,
+        menu_json: menuResponse.data.menu,
+        total_cost_eur: menuResponse.data.summary.total_cost_eur,
+      });
+
+      // Step 3: Guardar lista de compra
+      setStatus('Creando lista de compra...');
+      await shoppingAPI.save({
+        menu_id: null, // Se actualizará después
+        list_json: menuResponse.data.shopping_list,
+        total_items: menuResponse.data.shopping_list.total_items,
+        estimated_cost_eur: menuResponse.data.shopping_list.estimated_cost_eur,
+      });
+
+      clearInterval(progressInterval);
+      setProgress(100);
+      setStatus('¡Listo!');
+
+      setTimeout(() => {
+        navigate('/success');
+      }, 1000);
+
+    } catch (error: any) {
+      console.error('Error generando menú:', error);
+      toast.error('Error al generar el menú. Intenta de nuevo.');
+      navigate('/dashboard');
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="card-chalk max-w-md w-full text-center">
+        <h2 className="text-4xl mb-6">Creando tu menú...</h2>
+        <div className="mb-4">
+          <div className="bg-chalkboard-light rounded-full h-4 overflow-hidden">
+            <div 
+              className="bg-accent-green h-full transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <p className="text-chalk-cream mt-2">{progress}%</p>
+        </div>
+        <p className="text-lg text-chalk-cream">{status}</p>
+      </div>
+    </div>
+  );
+}
+
+src/pages/dashboard/DashboardLayout.tsx:
+import { Routes, Route } from 'react-router-dom';
+import BottomNav from '../../components/layout/BottomNav';
+import Home from './Home';
+import ShoppingList from './ShoppingList';
+import Achievements from './Achievements';
+import Profile from './Profile';
+
+export default function DashboardLayout() {
+  return (
+    <div className="min-h-screen pb-20">
+      <Routes>
+        <Route index element={<Home />} />
+        <Route path="shopping" element={<ShoppingList />} />
+        <Route path="achievements" element={<Achievements />} />
+        <Route path="profile" element={<Profile />} />
+      </Routes>
+      <BottomNav />
+    </div>
+  );
+}
+
+src/components/layout/BottomNav.tsx:
+import { Link, useLocation } from 'react-router-dom';
+import { Home, ShoppingCart, Trophy, User } from 'lucide-react';
+
+export default function BottomNav() {
+  const location = useLocation();
+  
+  const isActive = (path: string) => location.pathname.includes(path);
+  
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 bg-chalkboard-medium border-t-2 border-chalkboard-light">
+      <div className="flex justify-around items-center h-16">
+        <Link to="/dashboard" className={isActive('/dashboard') && !location.pathname.includes('/shopping') ? 'text-accent-green' : 'text-chalk-white'}>
+          <Home size={24} />
+        </Link>
+        <Link to="/dashboard/shopping" className={isActive('shopping') ? 'text-accent-green' : 'text-chalk-white'}>
+          <ShoppingCart size={24} />
+        </Link>
+        <Link to="/dashboard/achievements" className={isActive('achievements') ? 'text-accent-green' : 'text-chalk-white'}>
+          <Trophy size={24} />
+        </Link>
+        <Link to="/dashboard/profile" className={isActive('profile') ? 'text-accent-green' : 'text-chalk-white'}>
+          <User size={24} />
+        </Link>
+      </div>
+    </nav>
+  );
+}
+
+PASO 14: README.md
+# tcf-webapp
+
+Aplicación web React para TheCookFlow
+
+## Stack
+- React 18
+- TypeScript
+- Vite
+- TailwindCSS
+- Zustand
+- React Router
+
+## Features
+- Autenticación JWT
+- Onboarding 8 pasos
+- Generación menús con IA
+- Dashboard completo
+- Gamificación
+
+## Setup
+1. Configurar Secrets
+2. npm install
+3. npm run dev
+
+## Deploy
+Coolify auto-deploy desde GitHub.
+
+PASO 15: .gitignore
+node_modules/
+dist/
+.env
+.env.local
+*.log
+
+VERIFICACIÓN:
+1. npm install
+2. npm run dev
+3. Abre http://localhost:5173
+4. Debe cargar landing page
+
+COMMIT:
+git add .
+git commit -m "feat: webapp initial structure v1.0.0"
+git push origin main

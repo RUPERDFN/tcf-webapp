@@ -1,31 +1,38 @@
 import { Switch, Route } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "react-hot-toast"; // Using hot-toast as requested
 import NotFound from "@/pages/not-found";
 
-import LoginPage from "@/pages/login";
-import OnboardingPage from "@/pages/onboarding";
-import LoadingPage from "@/pages/loading";
-import DashboardPage from "@/pages/dashboard";
-import PremiumPage from "@/pages/premium";
-import ProfilePage from "@/pages/profile";
-import { Layout } from "./components/layout";
+// Pages
+import Landing from "@/pages/Landing";
+import Login from "@/pages/auth/Login";
+import Register from "@/pages/auth/Register";
+import OnboardingFlow from "@/pages/onboarding/OnboardingFlow";
+import LoadingPage from "@/pages/loading"; // Reusing existing
+import DashboardPage from "@/pages/dashboard"; // Reusing existing dashboard for now
+import { useAuthStore } from "@/lib/stores/authStore";
 
-// Placeholder pages
-const HistoryPage = () => <Layout><div className="text-center py-20 text-2xl font-display">Menu History (Coming Soon)</div></Layout>;
+// Protected Route Wrapper
+const ProtectedRoute = ({ component: Component }: { component: any }) => {
+   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+   // Simple client-side protection
+   return isAuthenticated ? <Component /> : <Login />;
+};
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={LoginPage} />
-      <Route path="/login" component={LoginPage} />
-      <Route path="/onboarding" component={OnboardingPage} />
+      <Route path="/" component={Landing} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      
+      {/* Onboarding nested routes handled by OnboardingFlow component logic */}
+      <Route path="/onboarding/:step*" component={OnboardingFlow} />
+      
       <Route path="/loading" component={LoadingPage} />
       <Route path="/dashboard" component={DashboardPage} />
-      <Route path="/premium" component={PremiumPage} />
-      <Route path="/profile" component={ProfilePage} />
-      <Route path="/history" component={HistoryPage} />
+      
       <Route component={NotFound} />
     </Switch>
   );
@@ -34,7 +41,14 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster />
+      <Toaster position="top-center" toastOptions={{
+         style: {
+            background: '#2D2D2D',
+            color: '#F8F8F8',
+            fontFamily: 'Nunito',
+            border: '1px solid #404040'
+         }
+      }} />
       <Router />
     </QueryClientProvider>
   );
