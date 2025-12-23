@@ -1,0 +1,314 @@
+Necesito aplicar el diseño correcto "Chalkboard Aesthetic" a tcf-webapp.
+
+PASO 1: COPIAR ASSETS desde tcf-brand-master
+
+Primero, necesito que crees la carpeta public/ si no existe, y luego copies estos assets desde el repo tcf-brand-master:
+
+Clona el repo tcf-brand-master:
+git clone https://github.com/RUPERDFN/tcf-brand-master.git temp-brand
+
+Luego copia los assets necesarios:
+mkdir -p public/fonts
+mkdir -p public/brand
+mkdir -p public/icons
+
+cp temp-brand/fuentes/Cheveuxdange.ttf public/fonts/
+cp temp-brand/fondos/bg.png public/brand/bg-chalkboard.png
+cp temp-brand/fondos/textura-grunge-oscura.jpg public/brand/bg-texture.jpg
+cp temp-brand/logos/logo.PNG public/brand/logo.png
+cp temp-brand/logos/tomate.png public/icons/
+cp temp-brand/logos/zanahoria.png public/icons/
+cp temp-brand/logos/pimiento.png public/icons/
+cp temp-brand/logos/limon.png public/icons/
+
+# Limpiar
+rm -rf temp-brand
+
+PASO 2: ACTUALIZAR index.css con diseño real
+
+Reemplaza TODO el contenido de src/index.css con:
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap');
+
+@font-face {
+  font-family: 'Cheveuxdange';
+  src: url('/fonts/Cheveuxdange.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply font-body text-chalk-white;
+    background-color: #1A1A1A;
+    background-image: url('/brand/bg-chalkboard.png');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    min-height: 100vh;
+  }
+
+  @media (max-width: 768px) {
+    body {
+      background-size: contain;
+      background-repeat: repeat-y;
+    }
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-chalk;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  h1 {
+    @apply text-5xl md:text-6xl;
+  }
+
+  h2 {
+    @apply text-4xl md:text-5xl;
+  }
+
+  h3 {
+    @apply text-3xl md:text-4xl;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-accent-green text-chalkboard-dark font-chalk text-xl px-8 py-4 rounded-xl;
+    @apply shadow-[3px_3px_0_rgba(248,248,248,0.3)] hover:shadow-[5px_5px_0_rgba(248,248,248,0.3)];
+    @apply transition-all duration-200 hover:translate-x-[-2px] hover:translate-y-[-2px];
+    @apply border-2 border-chalk-white/20;
+  }
+  
+  .btn-secondary {
+    @apply border-3 border-chalk-white text-chalk-white font-chalk text-xl px-8 py-4 rounded-xl;
+    @apply bg-chalkboard-medium/50 backdrop-blur-sm;
+    @apply hover:bg-chalk-white/10 transition-all duration-200;
+    @apply shadow-[2px_2px_0_rgba(248,248,248,0.2)];
+  }
+  
+  .card-chalk {
+    @apply bg-chalkboard-medium/80 backdrop-blur-sm rounded-2xl p-8;
+    @apply border-2 border-chalkboard-light;
+    @apply shadow-[4px_4px_0_rgba(0,0,0,0.3)];
+  }
+  
+  .input-chalk {
+    @apply bg-chalkboard-light/50 backdrop-blur-sm;
+    @apply border-2 border-chalkboard-light text-chalk-white;
+    @apply px-4 py-3 rounded-lg outline-none;
+    @apply focus:border-accent-green focus:ring-2 focus:ring-accent-green/30;
+    @apply transition-all duration-200;
+    @apply font-body text-lg;
+  }
+
+  .input-chalk::placeholder {
+    @apply text-chalk-white/40;
+  }
+
+  .nav-item {
+    @apply flex flex-col items-center gap-1 text-chalk-white/60;
+    @apply hover:text-accent-green transition-colors duration-200;
+  }
+
+  .nav-item.active {
+    @apply text-accent-green;
+  }
+
+  .progress-bar {
+    @apply h-2 bg-chalkboard-light rounded-full overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-accent-green transition-all duration-500;
+    @apply shadow-[0_0_10px_rgba(93,185,168,0.5)];
+  }
+
+  .food-icon {
+    @apply w-16 h-16 object-contain filter drop-shadow-[2px_2px_4px_rgba(0,0,0,0.5)];
+  }
+
+  .chalk-text {
+    @apply font-chalk text-chalk-white;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .loading-spinner {
+    @apply animate-spin rounded-full border-4 border-chalkboard-light;
+    @apply border-t-accent-green w-12 h-12;
+  }
+}
+
+/* Animaciones personalizadas */
+@keyframes chalkWrite {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-chalk-write {
+  animation: chalkWrite 0.5s ease-out forwards;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2D2D2D;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #5DB9A8;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4db8a8;
+}
+
+PASO 3: ACTUALIZAR tailwind.config.js
+
+Reemplaza con:
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        chalk: {
+          white: '#F8F8F8',
+          cream: '#FFF8E7',
+        },
+        chalkboard: {
+          dark: '#1A1A1A',
+          medium: '#2D2D2D',
+          light: '#404040',
+        },
+        accent: {
+          green: '#5DB9A8',
+          red: '#E74C3C',
+          yellow: '#F39C12',
+          orange: '#E67E22',
+        },
+      },
+      fontFamily: {
+        chalk: ['Cheveuxdange', 'Permanent Marker', 'cursive'],
+        body: ['Nunito', 'Arial', 'sans-serif'],
+      },
+      boxShadow: {
+        'chalk': '2px 2px 0 rgba(255, 255, 255, 0.3)',
+        'chalk-lg': '4px 4px 0 rgba(255, 255, 255, 0.3)',
+      },
+    },
+  },
+  plugins: [],
+}
+
+PASO 4: MEJORAR Landing.tsx
+
+Reemplaza src/pages/Landing.tsx con:
+
+import { Link } from 'react-router-dom';
+import Button from '../components/ui/Button';
+
+export default function Landing() {
+  return (
+    <div className="min-h-screen flex flex-col">
+      {/* Header */}
+      <header className="py-6 px-4 backdrop-blur-sm bg-chalkboard-dark/30">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <img src="/brand/logo.png" alt="TheCookFlow" className="h-12 w-auto" />
+            <h1 className="text-3xl font-chalk text-chalk-white">TheCookFlow</h1>
+          </div>
+          <Link to="/login">
+            <button className="text-chalk-white hover:text-accent-green transition-colors font-semibold">
+              Entrar
+            </button>
+          </Link>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <main className="flex-1 flex items-center justify-center px-4 py-16">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="mb-8 animate-chalk-write">
+            <h2 className="text-6xl md:text-7xl font-chalk mb-4 text-chalk-white">
+              ¿Qué quieres comer
+            </h2>
+            <h2 className="text-6xl md:text-7xl font-chalk mb-4 text-chalk-white">
+              esta semana?
+            </h2>
+          </div>
+
+          <p className="text-2xl md:text-3xl text-chalk-cream mb-8 font-body max-w-3xl mx-auto animate-chalk-write" style={{animationDelay: '0.2s'}}>
+            Tu chef personal con IA. Menús semanales + lista de compra automática en 2 minutos.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-chalk-write" style={{animationDelay: '0.4s'}}>
+            <Link to="/register">
+              <Button variant="primary" className="w-full sm:w-auto">
+                🍎 Empezar Gratis
+              </Button>
+            </Link>
+            <Link to="/login">
+              <Button variant="secondary" className="w-full sm:w-auto">
+                Ya tengo cuenta
+              </Button>
+            </Link>
+          </div>
+
+          {/* Iconos decorativos */}
+          <div className="flex justify-center gap-8 mt-16 animate-chalk-write" style={{animationDelay: '0.6s'}}>
+            <img src="/icons/tomate.png" alt="Tomate" className="food-icon" />
+            <img src="/icons/zanahoria.png" alt="Zanahoria" className="food-icon" />
+            <img src="/icons/pimiento.png" alt="Pimiento" className="food-icon" />
+            <img src="/icons/limon.png" alt="Limón" className="food-icon" />
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="py-8 px-4 backdrop-blur-sm bg-chalkboard-dark/30 border-t-2 border-chalkboard-light">
+        <div className="max-w-6xl mx-auto text-center">
+          <p className="text-chalk-cream font-body">
+            © 2025 TheCookFlow - Planificación inteligente de menús
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+VERIFICACIÓN:
+1. Los assets deben estar en public/
+2. La fuente Cheveuxdange debe cargarse
+3. El fondo de pizarra debe verse
+4. Los botones deben tener efecto chalk (sombra)
+5. Los iconos de comida deben mostrarse
+
+Si hay errores con las rutas de assets, ajústalas según donde estén realmente los archivos.
+
+Commit: "feat: apply chalkboard design system"
