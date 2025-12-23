@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useStore } from '@/lib/store';
+import { useDashboardStore } from '@/lib/stores/dashboardStore';
 import { Layout } from '@/components/layout';
 import { ChalkCard } from '@/components/chalk-card';
 import { ChalkButton } from '@/components/chalk-button';
@@ -9,13 +9,8 @@ import { RefreshCw, Shuffle } from 'lucide-react';
 import { useLocation } from 'wouter';
 
 export default function DashboardPage() {
-  const { menu, shoppingList, toggleShoppingItem } = useStore();
+  const { menu, shoppingList, toggleShoppingItem } = useDashboardStore();
   const [, setLocation] = useLocation();
-
-  if (menu.length === 0) {
-    // Redirect if no data (dev convenience)
-    // setLocation('/loading'); 
-  }
 
   const groupedMenu = menu.reduce((acc, item) => {
     if (!acc[item.day]) acc[item.day] = [];
@@ -61,7 +56,10 @@ export default function DashboardPage() {
                 </div>
               </div>
             )) : (
-              <div className="text-center py-10 opacity-50">No menu generated. Go to Profile to setup.</div>
+              <div className="text-center py-10 opacity-50">
+                 No menu generated. <br/>
+                 <ChalkButton variant="accent" className="mt-4" onClick={() => setLocation('/loading')}>Generate Now</ChalkButton>
+              </div>
             )}
           </TabsContent>
 

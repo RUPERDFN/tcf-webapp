@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import api from '@/lib/api';
-import { useStore } from '@/lib/store';
+import { menuAPI, shoppingAPI } from '@/lib/api';
+import { useOnboardingStore } from '@/lib/stores/onboardingStore';
+import { useDashboardStore } from '@/lib/stores/dashboardStore';
 import { Layout } from '@/components/layout';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function LoadingPage() {
   const [, setLocation] = useLocation();
-  const { setMenu, setShoppingList, onboardingData } = useStore();
+  const onboardingData = useOnboardingStore();
+  const { setMenu, setShoppingList } = useDashboardStore();
   const { toast } = useToast();
   const [status, setStatus] = useState('Talking to the Chef...');
 
@@ -16,25 +18,26 @@ export default function LoadingPage() {
     const generate = async () => {
       try {
         setStatus('Curating recipes...');
-        await api.post('/menu/generate', onboardingData);
+        // menuAPI.generate expects "profile" object. onboardingData IS the profile structure roughly.
+        await menuAPI.generate(onboardingData, onboardingData.days);
         
         setStatus('Planning your week...');
-        const menuRes = await api.get('/menus/latest'); // Mock endpoint to get "generated" menu
+        const menuRes = await menuAPI.getLatest();
         setMenu(menuRes.data);
 
         setStatus('Writing shopping list...');
-        const shopRes = await api.get('/shopping/latest');
+        const shopRes = await shoppingAPI.getLatest();
         setShoppingList(shopRes.data);
         
-        // Finalize API calls
-        await api.post('/api/menus', { menu: menuRes.data });
-        await api.post('/api/shopping', { list: shopRes.data });
-
+        // Finalize (Mock save calls if needed, or already handled by generate flow in real backend)
+        // Since we are mocking, menuAPI.generate returns data but getLatest fetches it. 
+        // In our mock api.ts, getLatest returns static data.
+        
         setTimeout(() => setLocation('/dashboard'), 1000);
       } catch (error) {
         console.error(error);
         toast({ title: "Error", description: "Chef burned the food. Try again.", variant: "destructive" });
-        setLocation('/onboarding');
+        setLocation('/onboarding/1');
       }
     };
 
