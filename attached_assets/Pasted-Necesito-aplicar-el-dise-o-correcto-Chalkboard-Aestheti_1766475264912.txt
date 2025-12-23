@@ -1,0 +1,94 @@
+Necesito aplicar el diseño correcto "Chalkboard Aesthetic" a tcf-webapp.
+
+PASO 1: COPIAR ASSETS desde tcf-brand-master
+
+Primero, necesito que crees la carpeta public/ si no existe, y luego copies estos assets desde el repo tcf-brand-master:
+
+Clona el repo tcf-brand-master:
+git clone https://github.com/RUPERDFN/tcf-brand-master.git temp-brand
+
+Luego copia los assets necesarios:
+mkdir -p public/fonts
+mkdir -p public/brand
+mkdir -p public/icons
+
+cp temp-brand/fuentes/Cheveuxdange.ttf public/fonts/
+cp temp-brand/fondos/bg.png public/brand/bg-chalkboard.png
+cp temp-brand/fondos/textura-grunge-oscura.jpg public/brand/bg-texture.jpg
+cp temp-brand/logos/logo.PNG public/brand/logo.png
+cp temp-brand/logos/tomate.png public/icons/
+cp temp-brand/logos/zanahoria.png public/icons/
+cp temp-brand/logos/pimiento.png public/icons/
+cp temp-brand/logos/limon.png public/icons/
+
+# Limpiar
+rm -rf temp-brand
+
+PASO 2: ACTUALIZAR index.css con diseño real
+
+Reemplaza TODO el contenido de src/index.css con:
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap');
+
+@font-face {
+  font-family: 'Cheveuxdange';
+  src: url('/fonts/Cheveuxdange.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply font-body text-chalk-white;
+    background-color: #1A1A1A;
+    background-image: url('/brand/bg-chalkboard.png');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    min-height: 100vh;
+  }
+
+  @media (max-width: 768px) {
+    body {
+      background-size: contain;
+      background-repeat: repeat-y;
+    }
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-chalk;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  h1 {
+    @apply text-5xl md:text-6xl;
+  }
+
+  h2 {
+    @apply text-4xl md:text-5xl;
+  }
+
+  h3 {
+    @apply text-3xl md:text-4xl;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-accent-green text-chalkboard-dark font-chalk text-xl px-8 py-4 rounded-xl;
+    @apply shadow-[3px_3px_0_rgba(248,248,248,0.3)] hover:shadow-[5px_5px_0_rgba(248,248,248,0.3)];
+    @apply transition-all duration-200 hover:translate-x-[-2px] hover:translate-y-[-2px];
+    @apply border-2 border-chalk-white/20;
+  }
+  
+  .b
