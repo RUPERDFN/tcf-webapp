@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { useAuthStore } from './stores/authStore';
 
-// We'll use mock data for now, but keeping structure ready for env vars
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-const CHEF_BASE_URL = import.meta.env.VITE_CHEF_BASE_URL || 'http://localhost:5000/chef'; // Using same base for mock
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const CHEF_BASE_URL = import.meta.env.VITE_CHEF_BASE_URL || 'http://localhost:8000';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -13,7 +12,7 @@ export const chefClient = axios.create({
   baseURL: CHEF_BASE_URL,
 });
 
-// Interceptor para añadir token JWT
+// Interceptor para JWT
 apiClient.interceptors.request.use((config) => {
   const token = useAuthStore.getState().token;
   if (token) {
@@ -22,7 +21,7 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// MOCK ADAPTERS (Because no backend)
+// MOCK ADAPTERS (Preserved for frontend-only mode)
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -87,47 +86,48 @@ chefClient.interceptors.response.use(
   }
 );
 
-
 // Auth API
 export const authAPI = {
   register: (email: string, password: string) =>
-    apiClient.post('/auth/register', { email, password }),
+    apiClient.post('/api/auth/register', { email, password }),
   login: (email: string, password: string) =>
-    apiClient.post('/auth/login', { email, password }),
+    apiClient.post('/api/auth/login', { email, password }),
 };
 
 // Profile API
 export const profileAPI = {
-  get: () => apiClient.get('/profile'),
-  update: (data: any) => apiClient.put('/profile', data),
+  get: () => apiClient.get('/api/profile'),
+  update: (data: any) => apiClient.put('/api/profile', data),
 };
 
 // Menu API
 export const menuAPI = {
-  generate: (profile: any, days: number) => 
-    chefClient.post('/menu/generate', { 
-      user_id: useAuthStore.getState().user?.id,
+  generate: (profile: any, days: number) => {
+    const userId = useAuthStore.getState().user?.id;
+    return chefClient.post('/menu/generate', { 
+      user_id: userId,
       profile, 
       days 
-    }),
-  save: (menuData: any) => apiClient.post('/menus', menuData),
-  getLatest: () => apiClient.get('/menus/latest'),
-  getHistory: () => apiClient.get('/menus/history'),
+    });
+  },
+  save: (menuData: any) => apiClient.post('/api/menus', menuData),
+  getLatest: () => apiClient.get('/api/menus/latest'),
+  getHistory: () => apiClient.get('/api/menus/history'),
 };
 
 // Shopping API
 export const shoppingAPI = {
-  save: (data: any) => apiClient.post('/shopping', data),
-  getLatest: () => apiClient.get('/shopping/latest'),
+  save: (data: any) => apiClient.post('/api/shopping', data),
+  getLatest: () => apiClient.get('/api/shopping/latest'),
 };
 
 // Achievements API
 export const achievementsAPI = {
-  getAll: () => apiClient.get('/achievements'),
-  getUserAchievements: () => apiClient.get('/achievements/user'),
+  getAll: () => apiClient.get('/api/achievements'),
+  getUserAchievements: () => apiClient.get('/api/achievements/user'),
 };
 
 // Stats API
 export const statsAPI = {
-  get: () => apiClient.get('/stats'),
+  get: () => apiClient.get('/api/stats'),
 };

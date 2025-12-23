@@ -1,0 +1,76 @@
+Corrige el archivo src/lib/api.ts
+
+El problema es que estamos usando "export default" en algunos lugares pero importando named exports en otros.
+
+Reemplaza TODO el contenido de src/lib/api.ts con esto:
+
+import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const CHEF_BASE_URL = import.meta.env.VITE_CHEF_BASE_URL || 'http://localhost:8000';
+
+export const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+export const chefClient = axios.create({
+  baseURL: CHEF_BASE_URL,
+});
+
+// Interceptor para JWT
+apiClient.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Auth API
+export const authAPI = {
+  register: (email: string, password: string) =>
+    apiClient.post('/api/auth/register', { email, password }),
+  login: (email: string, password: string) =>
+    apiClient.post('/api/auth/login', { email, password }),
+};
+
+// Profile API
+export const profileAPI = {
+  get: () => apiClient.get('/api/profile'),
+  update: (data: any) => apiClient.put('/api/profile', data),
+};
+
+// Menu API
+export const menuAPI = {
+  generate: (profile: any, days: number) => {
+    const userId = useAuthStore.getState().user?.id;
+    return chefClient.post('/menu/generate', { 
+      user_id: userId,
+      profile, 
+      days 
+    });
+  },
+  save: (menuData: any) => apiClient.post('/api/menus', menuData),
+  getLatest: () => apiClient.get('/api/menus/latest'),
+  getHistory: () => apiClient.get('/api/menus/history'),
+};
+
+// Shopping API
+export const shoppingAPI = {
+  save: (data: any) => apiClient.post('/api/shopping', data),
+  getLatest: () => apiClient.get('/api/shopping/latest'),
+};
+
+// Achievements API
+export const achievementsAPI = {
+  getAll: () => apiClient.get('/api/achievements'),
+  getUserAchievements: () => apiClient.get('/api/achievements/user'),
+};
+
+// Stats API
+export const statsAPI = {
+  get: () => apiClient.get('/api/stats'),
+};
+
+Luego guarda y verifica que la app recargue sin errores.
