@@ -1,6 +1,7 @@
 import { Switch, Route, Redirect } from 'wouter';
 import { useOnboardingStore } from '../../lib/stores/onboardingStore';
 import Step1Budget from './Step1Budget';
+import Step2Diners from './Step2Diners';
 
 // Placeholder steps for now
 const PlaceholderStep = ({ step, title }: { step: number, title: string }) => {
@@ -32,7 +33,8 @@ export default function OnboardingFlow() {
         {/* Routes */}
         <Switch>
           <Route path="/onboarding/1" component={Step1Budget} />
-          {/* <Route path="/onboarding/2" component={Step2Diners} /> */}
+          <Route path="/onboarding/2" component={Step2Diners} />
+          <Route path="/onboarding/3"><PlaceholderStep step={3} title="¿Cuántas comidas?" /></Route>
           <Route path="/onboarding/:rest*"><Redirect to="/onboarding/1" /></Route>
         </Switch>
       </div>

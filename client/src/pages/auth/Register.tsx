@@ -20,10 +20,10 @@ export default function Register() {
     try {
       const response = await authAPI.register(email, password);
       login(response.data.user, response.data.token);
-      toast.success('¡Cuenta creada!');
-      setLocation('/onboarding/1'); // Start onboarding flow
+      toast.success('¡Cuenta creada! Comencemos...');
+      setLocation('/onboarding/1');
     } catch (error: any) {
-      toast.error('Error al registrarse');
+      toast.error(error.response?.data?.error || 'Error al crear cuenta');
     } finally {
       setLoading(false);
     }
@@ -31,31 +31,42 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="card-chalk w-full max-w-md">
-        <h2 className="text-4xl mb-6 text-center text-accent-green">Crear Cuenta</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="card-tcf w-full max-w-md fade-in">
+        <div className="text-center mb-8">
+          <img src="/logos/logo.png" alt="TheCookFlow" className="w-16 h-16 mx-auto mb-2" />
+          <h2 className="text-4xl font-chalk">Crear Cuenta</h2>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
           <Input
             type="email"
             label="Email"
+            placeholder="tu@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            placeholder="nuevo@chef.com"
           />
           <Input
             type="password"
             label="Contraseña"
+            placeholder="Mínimo 8 caracteres"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            placeholder="••••••••"
+            minLength={8}
           />
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Cargando...' : 'Registrarse'}
+            {loading ? 'Creando cuenta...' : 'Empezar gratis'}
           </Button>
         </form>
-        <p className="text-center mt-4">
-          ¿Ya tienes cuenta? <Link href="/login"><span className="text-accent-green cursor-pointer hover:underline">Inicia Sesión</span></Link>
+        
+        <p className="text-center mt-6 text-gray-300">
+          ¿Ya tienes cuenta?{' '}
+          <Link href="/login">
+             <span className="text-accent-green hover:underline cursor-pointer">
+                Iniciar sesión
+             </span>
+          </Link>
         </p>
       </div>
     </div>

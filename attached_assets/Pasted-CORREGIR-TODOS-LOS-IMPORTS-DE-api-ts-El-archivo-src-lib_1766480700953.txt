@@ -1,0 +1,229 @@
+CORREGIR TODOS LOS IMPORTS DE api.ts
+
+El archivo src/lib/api.ts usa NAMED EXPORTS, no default export.
+Necesito que corrijas TODOS los archivos que importan desde api.ts.
+
+PASO 1: Buscar archivos con imports incorrectos
+
+Ejecuta en Shell:
+grep -r "import.*from.*api" src/
+
+PASO 2: Corregir TODOS los archivos que usen api.ts
+
+Los archivos que probablemente tienen el import incorrecto son:
+- src/pages/auth/Login.tsx
+- src/pages/auth/Register.tsx
+- src/pages/generation/Loading.tsx
+- src/pages/dashboard/Home.tsx
+- src/pages/dashboard/Profile.tsx
+- src/pages/dashboard/ShoppingList.tsx
+- src/pages/dashboard/Achievements.tsx
+
+Para CADA archivo, el import debe ser así:
+
+CORRECTO:
+import { authAPI } from '../../lib/api';
+import { menuAPI, shoppingAPI } from '../../lib/api';
+import { profileAPI } from '../../lib/api';
+import { achievementsAPI } from '../../lib/api';
+import { statsAPI } from '../../lib/api';
+
+INCORRECTO (no usar):
+import api from '../../lib/api';
+
+PASO 3: Reemplazar archivos problemáticos
+
+Si no existen algunos archivos o están incompletos, créalos con este código:
+
+--- src/pages/auth/Register.tsx ---
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuthStore } from '../../store/authStore';
+import { authAPI } from '../../lib/api';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import toast from 'react-hot-toast';
+
+export default function Register() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const response = await authAPI.register(email, password);
+      login(response.data.user, response.data.token);
+      toast.success('¡Cuenta creada! Comencemos...');
+      navigate('/onboarding/1');
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Error al crear cuenta');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="card-tcf w-full max-w-md fade-in">
+        <div className="text-center mb-8">
+          <img src="/logos/logo.png" alt="TheCookFlow" className="w-16 h-16 mx-auto mb-2" />
+          <h2 className="text-4xl font-chalk">Crear Cuenta</h2>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <Input
+            type="email"
+            label="Email"
+            placeholder="tu@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <Input
+            type="password"
+            label="Contraseña"
+            placeholder="Mínimo 8 caracteres"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={8}
+          />
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? 'Creando cuenta...' : 'Empezar gratis'}
+          </Button>
+        </form>
+        
+        <p className="text-center mt-6 text-gray-300">
+          ¿Ya tienes cuenta?{' '}
+          <Link to="/login" className="text-accent-green hover:underline">
+            Iniciar sesión
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+--- src/pages/onboarding/Step2Diners.tsx ---
+import { useNavigate } from 'react-router-dom';
+import { useOnboardingStore } from '../../store/onboardingStore';
+import Button from '../../components/ui/Button';
+
+export default function Step2Diners() {
+  const navigate = useNavigate();
+  const { diners, setField, prevStep } = useOnboardingStore();
+
+  const handleNext = () => {
+    if (diners >= 1 && diners <= 20) {
+      navigate('/onboarding/3');
+    }
+  };
+
+  return (
+    <div className="card-tcf fade-in">
+      <div className="text-center mb-8">
+        <img src="/logos/logo.png" alt="TheCookFlow" className="w-16 h-16 mx-auto mb-2" />
+        <h3 className="text-2xl font-chalk">The CookFlow</h3>
+      </div>
+
+      <h2 className="text-3xl md:text-4xl font-chalk text-center mb-8">
+        Número de comensales
+      </h2>
+
+      <p className="text-gray-300 text-center mb-6">
+        ¿Para cuántas personas cocinas?
+      </p>
+
+      <div className="mb-8">
+        <div className="flex justify-center gap-4 flex-wrap">
+          {[1, 2, 3, 4, 5, 6].map((num) => (
+            <button
+              key={num}
+              onClick={() => setField('diners', num)}
+              className={`number-selector ${diners === num ? 'selected' : ''}`}
+            >
+              {num}
+            </button>
+          ))}
+        </div>
+        <p className="text-gray-400 text-sm mt-4 text-center">
+          También puedes escribir un número
+        </p>
+        <input
+          type="number"
+          className="input-tcf mt-2"
+          placeholder="Ej: 4"
+          value={diners || ''}
+          onChange={(e) => setField('diners', parseInt(e.target.value) || 0)}
+          min={1}
+          max={20}
+        />
+      </div>
+
+      <div className="flex justify-between">
+        <Button variant="outline" onClick={() => navigate('/onboarding/1')}>
+          Atrás
+        </Button>
+        <Button 
+          onClick={handleNext}
+          disabled={diners < 1 || diners > 20}
+        >
+          Siguiente
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+PASO 4: Verificar que Button.tsx tenga variant="outline"
+
+Si Button.tsx da error, actualízalo:
+
+--- src/components/ui/Button.tsx ---
+import { ButtonHTMLAttributes } from 'react';
+
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'outline';
+  children: React.ReactNode;
+}
+
+export default function Button({ 
+  variant = 'primary', 
+  children, 
+  className = '', 
+  ...props 
+}: ButtonProps) {
+  const baseClass = variant === 'primary' 
+    ? 'btn-siguiente' 
+    : 'btn-outline';
+  
+  return (
+    <button className={`${baseClass} ${className}`} {...props}>
+      {children}
+    </button>
+  );
+}
+
+PASO 5: Verificar react-hot-toast
+
+Si hay error con toast, instalar:
+npm install react-hot-toast
+
+Y verificar que App.tsx tenga:
+import { Toaster } from 'react-hot-toast';
+
+Y dentro del return:
+<Toaster position="top-center" />
+
+PASO 6: Compilar y verificar
+
+npm run dev
+
+Debe iniciar sin errores.
+
+Commit: "fix: correct all api imports to named exports"
