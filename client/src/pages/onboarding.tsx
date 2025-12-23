@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { useStore } from '@/lib/store';
-import api from '@/lib/api';
+import { menuAPI, shoppingAPI } from '@/lib/api';
 import { ChalkButton } from '@/components/chalk-button';
 import { ChalkCard } from '@/components/chalk-card';
 import { Input } from '@/components/ui/input';
