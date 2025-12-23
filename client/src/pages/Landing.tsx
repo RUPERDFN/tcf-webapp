@@ -3,20 +3,21 @@ import { Link } from 'wouter';
 export default function Landing() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
-      {/* Logo con manzana */}
-      <div className="logo-container mb-12 fade-in">
+      {/* Logo real */}
+      <div className="mb-12 fade-in">
         <div className="text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            {/* Puedes usar un emoji o el logo PNG real */}
-            <span className="text-7xl drop-shadow-lg">🍎</span>
-          </div>
+          <img 
+            src="/logos/logo.png" 
+            alt="TheCookFlow" 
+            className="w-48 h-auto mx-auto mb-4 drop-shadow-2xl"
+          />
           <h1 className="text-6xl md:text-7xl font-chalk text-white">
             The CookFlow
           </h1>
         </div>
       </div>
 
-      {/* Título principal */}
+      {/* Título */}
       <div className="text-center max-w-2xl mb-12 fade-in" style={{animationDelay: '0.2s'}}>
         <h2 className="text-4xl md:text-5xl font-chalk text-white mb-6">
           ¿Qué quieres comer esta semana?
@@ -40,12 +41,12 @@ export default function Landing() {
         </Link>
       </div>
 
-      {/* Iconos decorativos */}
-      <div className="flex gap-8 fade-in flex-wrap justify-center" style={{animationDelay: '0.6s'}}>
-        <span className="text-6xl drop-shadow-lg filter hover:scale-110 transition-transform cursor-default">🍅</span>
-        <span className="text-6xl drop-shadow-lg filter hover:scale-110 transition-transform cursor-default">🥕</span>
-        <span className="text-6xl drop-shadow-lg filter hover:scale-110 transition-transform cursor-default">🌶️</span>
-        <span className="text-6xl drop-shadow-lg filter hover:scale-110 transition-transform cursor-default">🥒</span>
+      {/* Iconos reales */}
+      <div className="flex gap-8 fade-in justify-center flex-wrap" style={{animationDelay: '0.6s'}}>
+        <img src="/icons/tomate.png" alt="Tomate" className="w-16 h-16 hover:scale-110 transition-transform drop-shadow-lg object-contain" />
+        <img src="/icons/zanahoria.png" alt="Zanahoria" className="w-16 h-16 hover:scale-110 transition-transform drop-shadow-lg object-contain" />
+        <img src="/icons/pimiento.png" alt="Pimiento" className="w-16 h-16 hover:scale-110 transition-transform drop-shadow-lg object-contain" />
+        <img src="/icons/limon.png" alt="Limón" className="w-16 h-16 hover:scale-110 transition-transform drop-shadow-lg object-contain" />
       </div>
     </div>
   );

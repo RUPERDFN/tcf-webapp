@@ -6,13 +6,8 @@
   --color-accent-green: #5DB9A8;
 }
 
-/* Emulate the user's font request */
-@font-face {
-  font-family: 'Permanent Marker';
-  src: local('Permanent Marker'), url('https://fonts.gstatic.com/s/permanentmarker/v16/Fh4uPib9Iyv2ucM6pGQMWimMp004La2C.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-}
+/* Emulate user's font import */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Permanent+Marker&display=swap');
 
 @layer base {
   * {
@@ -33,7 +28,6 @@
 
   @media (max-width: 768px) {
     body {
-      background-size: cover;
       background-attachment: scroll;
     }
   }
@@ -42,22 +36,9 @@
     @apply font-chalk text-white;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   }
-
-  h1 {
-    @apply text-5xl md:text-6xl;
-  }
-
-  h2 {
-    @apply text-4xl md:text-5xl;
-  }
-
-  h3 {
-    @apply text-3xl md:text-4xl;
-  }
 }
 
 @layer components {
-  /* Botón Siguiente - Verde con efecto pincelada */
   .btn-siguiente {
     @apply relative px-12 py-4 text-white font-bold text-xl;
     background: linear-gradient(135deg, #5DB9A8 0%, #4db8a8 100%);
@@ -81,7 +62,6 @@
     @apply opacity-50 cursor-not-allowed shadow-none transform-none;
   }
 
-  /* Botón outline blanco */
   .btn-outline {
     @apply px-8 py-4 text-white font-bold text-lg;
     @apply border-2 border-white rounded-full;
@@ -89,7 +69,6 @@
     @apply transition-all duration-300 cursor-pointer;
   }
 
-  /* Input estilo TheCookFlow */
   .input-tcf {
     @apply w-full px-6 py-4 text-white border-2 border-white rounded-2xl;
     @apply bg-black/30 backdrop-blur-sm;
@@ -101,7 +80,6 @@
     @apply text-gray-400;
   }
 
-  /* Pills seleccionables */
   .pill {
     @apply px-6 py-3 border-2 border-white rounded-full text-white font-semibold;
     @apply bg-transparent hover:bg-white hover:text-black cursor-pointer;
@@ -112,7 +90,6 @@
     @apply bg-white text-black;
   }
 
-  /* Card container */
   .card-tcf {
     @apply bg-black/60 backdrop-blur-md p-8 rounded-3xl;
     @apply border border-white/10;
@@ -120,12 +97,6 @@
     @apply shadow-2xl;
   }
 
-  /* Logo container */
-  .logo-container {
-    @apply flex items-center justify-center gap-3;
-  }
-
-  /* Número selector */
   .number-selector {
     @apply w-16 h-16 flex items-center justify-center;
     @apply border-2 border-white rounded-xl text-2xl font-bold;
@@ -137,20 +108,6 @@
     @apply bg-white text-black;
   }
 
-  /* Círculo de alergia prohibido */
-  .allergen-circle {
-    @apply w-24 h-24 rounded-full border-4 border-red-500;
-    @apply flex items-center justify-center relative;
-    @apply bg-black/60 cursor-pointer;
-  }
-
-  .allergen-circle::after {
-    content: '';
-    @apply absolute w-28 h-1 bg-red-500;
-    transform: rotate(45deg);
-  }
-
-  /* Bottom Navigation */
   .bottom-nav {
     @apply fixed bottom-0 left-0 right-0;
     @apply bg-black/80 backdrop-blur-md border-t-2 border-white/10;
@@ -159,15 +116,13 @@
 
   .nav-item {
     @apply flex flex-col items-center gap-1 text-gray-400;
-    @apply hover:text-accent-green transition-colors cursor-pointer;
-    @apply py-2;
+    @apply hover:text-accent-green transition-colors cursor-pointer py-2;
   }
 
   .nav-item.active {
     @apply text-accent-green;
   }
 
-  /* Progress bar para onboarding */
   .progress-bar {
     @apply h-2 bg-white/20 rounded-full overflow-hidden;
   }
@@ -175,32 +130,22 @@
   .progress-fill {
     @apply h-full bg-accent-green transition-all duration-500;
   }
+
+  .loading-spinner {
+    @apply w-12 h-12 border-4 border-white/20 border-t-accent-green rounded-full;
+    animation: spin 1s linear infinite;
+  }
 }
 
-/* Animaciones */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .fade-in {
   animation: fadeIn 0.6s ease-out;
 }
 
-/* Loading spinner */
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.loading-spinner {
-  @apply w-12 h-12 border-4 border-white/20 border-t-accent-green rounded-full;
-  animation: spin 1s linear infinite;
+  to { transform: rotate(360deg); }
 }

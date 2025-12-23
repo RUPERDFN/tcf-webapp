@@ -1,0 +1,315 @@
+APLICAR DISEÑO REAL THECOOKFLOW - Versión Final
+
+El repo tcf-brand-master ahora es público, así que puedo clonar directamente.
+
+PASO 1: CLONAR REPO Y COPIAR ASSETS
+
+# Clonar repo público
+git clone https://github.com/RUPERDFN/tcf-brand-master.git temp-brand
+
+# Crear estructura public
+mkdir -p public/bg
+mkdir -p public/logos
+mkdir -p public/icons
+
+# Copiar assets necesarios
+cp temp-brand/fondos/bg.png public/bg/
+cp temp-brand/fondos/textura-grunge-oscura.jpg public/bg/
+
+# Copiar logos
+cp temp-brand/logos/logo.PNG public/logos/logo.png
+cp temp-brand/logos/chef.png public/logos/
+cp temp-brand/logos/menu.png public/logos/
+cp temp-brand/logos/lista.png public/logos/
+cp temp-brand/logos/recetas.png public/logos/
+cp temp-brand/logos/comparador.png public/logos/
+
+# Copiar iconos de comida
+cp temp-brand/logos/tomate.png public/icons/
+cp temp-brand/logos/zanahoria.png public/icons/
+cp temp-brand/logos/pimiento.png public/icons/
+cp temp-brand/logos/limon.png public/icons/
+cp temp-brand/logos/hojas.png public/icons/
+
+# Limpiar
+rm -rf temp-brand
+
+PASO 2: ACTUALIZAR index.css (VERSIÓN FINAL)
+
+Reemplaza TODO src/index.css:
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Permanent+Marker&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply font-body text-white;
+    background: #1a1a1a;
+    background-image: url('/bg/bg.png');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    min-height: 100vh;
+  }
+
+  @media (max-width: 768px) {
+    body {
+      background-attachment: scroll;
+    }
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-chalk text-white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  }
+}
+
+@layer components {
+  .btn-siguiente {
+    @apply relative px-12 py-4 text-white font-bold text-xl;
+    background: linear-gradient(135deg, #5DB9A8 0%, #4db8a8 100%);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(93, 185, 168, 0.4);
+  }
+
+  .btn-siguiente:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(93, 185, 168, 0.6);
+  }
+
+  .btn-outline {
+    @apply px-8 py-4 text-white font-bold text-lg;
+    @apply border-2 border-white rounded-full;
+    @apply bg-transparent hover:bg-white hover:text-black;
+    @apply transition-all duration-300;
+  }
+
+  .input-tcf {
+    @apply w-full px-6 py-4 text-white border-2 border-white rounded-2xl;
+    @apply bg-black/30 backdrop-blur-sm;
+    @apply outline-none focus:border-accent-green focus:bg-black/50;
+    @apply transition-all text-lg;
+  }
+
+  .input-tcf::placeholder {
+    @apply text-gray-400;
+  }
+
+  .pill {
+    @apply px-6 py-3 border-2 border-white rounded-full text-white font-semibold;
+    @apply bg-transparent hover:bg-white hover:text-black cursor-pointer;
+    @apply transition-all duration-300;
+  }
+
+  .pill.selected {
+    @apply bg-white text-black;
+  }
+
+  .card-tcf {
+    @apply bg-black/60 backdrop-blur-md p-8 rounded-3xl;
+    @apply border border-white/10;
+    @apply max-w-md w-full mx-auto;
+    @apply shadow-2xl;
+  }
+
+  .number-selector {
+    @apply w-16 h-16 flex items-center justify-center;
+    @apply border-2 border-white rounded-xl text-2xl font-bold;
+    @apply cursor-pointer hover:bg-white hover:text-black transition-all;
+    @apply bg-black/40;
+  }
+
+  .number-selector.selected {
+    @apply bg-white text-black;
+  }
+
+  .bottom-nav {
+    @apply fixed bottom-0 left-0 right-0;
+    @apply bg-black/80 backdrop-blur-md border-t-2 border-white/10;
+    @apply flex justify-around items-center h-20 px-4;
+  }
+
+  .nav-item {
+    @apply flex flex-col items-center gap-1 text-gray-400;
+    @apply hover:text-accent-green transition-colors cursor-pointer py-2;
+  }
+
+  .nav-item.active {
+    @apply text-accent-green;
+  }
+
+  .progress-bar {
+    @apply h-2 bg-white/20 rounded-full overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-accent-green transition-all duration-500;
+  }
+
+  .loading-spinner {
+    @apply w-12 h-12 border-4 border-white/20 border-t-accent-green rounded-full;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+PASO 3: Landing.tsx con logo PNG real
+
+Reemplaza src/pages/Landing.tsx:
+
+import { Link } from 'react-router-dom';
+
+export default function Landing() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+      {/* Logo real */}
+      <div className="mb-12 fade-in">
+        <div className="text-center">
+          <img 
+            src="/logos/logo.png" 
+            alt="TheCookFlow" 
+            className="w-32 h-32 mx-auto mb-4 drop-shadow-2xl"
+          />
+          <h1 className="text-6xl md:text-7xl font-chalk text-white">
+            The CookFlow
+          </h1>
+        </div>
+      </div>
+
+      {/* Título */}
+      <div className="text-center max-w-2xl mb-12 fade-in" style={{animationDelay: '0.2s'}}>
+        <h2 className="text-4xl md:text-5xl font-chalk text-white mb-6">
+          ¿Qué quieres comer esta semana?
+        </h2>
+        <p className="text-xl text-gray-300 font-body">
+          Tu chef personal con IA. Menús semanales personalizados y lista de compra automática.
+        </p>
+      </div>
+
+      {/* CTAs */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-16 fade-in" style={{animationDelay: '0.4s'}}>
+        <Link to="/register">
+          <button className="btn-siguiente">
+            Empezar gratis
+          </button>
+        </Link>
+        <Link to="/login">
+          <button className="btn-outline">
+            Ya tengo cuenta
+          </button>
+        </Link>
+      </div>
+
+      {/* Iconos reales */}
+      <div className="flex gap-8 fade-in" style={{animationDelay: '0.6s'}}>
+        <img src="/icons/tomate.png" alt="Tomate" className="w-16 h-16 hover:scale-110 transition-transform drop-shadow-lg" />
+        <img src="/icons/zanahoria.png" alt="Zanahoria" className="w-16 h-16 hover:scale-110 transition-transform drop-shadow-lg" />
+        <img src="/icons/pimiento.png" alt="Pimiento" className="w-16 h-16 hover:scale-110 transition-transform drop-shadow-lg" />
+        <img src="/icons/limon.png" alt="Limón" className="w-16 h-16 hover:scale-110 transition-transform drop-shadow-lg" />
+      </div>
+    </div>
+  );
+}
+
+PASO 4: Step1Budget con logo real
+
+Reemplaza src/pages/onboarding/Step1Budget.tsx:
+
+import { useNavigate } from 'react-router-dom';
+import { useOnboardingStore } from '../../store/onboardingStore';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+
+export default function Step1Budget() {
+  const navigate = useNavigate();
+  const { budget_eur_week, setField } = useOnboardingStore();
+
+  const handleNext = () => {
+    if (budget_eur_week >= 30 && budget_eur_week <= 500) {
+      navigate('/onboarding/2');
+    }
+  };
+
+  return (
+    <div className="card-tcf fade-in">
+      {/* Logo real pequeño */}
+      <div className="text-center mb-8">
+        <img 
+          src="/logos/logo.png" 
+          alt="TheCookFlow" 
+          className="w-16 h-16 mx-auto mb-2"
+        />
+        <h3 className="text-2xl font-chalk">The CookFlow</h3>
+      </div>
+
+      {/* Pregunta */}
+      <h2 className="text-3xl md:text-4xl font-chalk text-center mb-8">
+        Presupuesto semanal
+      </h2>
+
+      <p className="text-gray-300 text-center mb-6">
+        ¿Cuánto quieres gastar en comida esta semana?
+      </p>
+
+      {/* Input */}
+      <div className="mb-8">
+        <Input
+          type="number"
+          placeholder="Ej: 50€"
+          value={budget_eur_week || ''}
+          onChange={(e) => setField('budget_eur_week', parseInt(e.target.value) || 0)}
+          min={30}
+          max={500}
+        />
+        <p className="text-gray-400 text-sm mt-2 text-center">
+          Entre 30€ y 500€ por semana
+        </p>
+      </div>
+
+      {/* Botón */}
+      <div className="flex justify-center">
+        <Button 
+          onClick={handleNext} 
+          disabled={budget_eur_week < 30 || budget_eur_week > 500}
+          className={budget_eur_week < 30 || budget_eur_week > 500 ? 'opacity-50 cursor-not-allowed' : ''}
+        >
+          Siguiente
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+VERIFICACIÓN:
+1. Fondo textura pizarra (bg.png)
+2. Logo PNG real de manzana roja
+3. Iconos PNG reales (tomate, zanahoria, etc)
+4. Botón verde "Siguiente"
+5. Inputs blancos semi-transparentes
+
+Commit: "feat: apply real design with public brand repo"
+Push a GitHub
