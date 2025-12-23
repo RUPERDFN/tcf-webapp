@@ -1,13 +1,9 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-display: "Permanent Marker", cursive;
-  --font-sans: "Nunito", sans-serif;
+  --font-chalk: 'Permanent Marker', cursive;
+  --font-body: 'Nunito', sans-serif;
 
-  /* Color Palette from PASO 4 */
   --color-chalk-white: #F8F8F8;
   --color-chalk-cream: #FFF8E7;
   
@@ -20,92 +16,178 @@
   --color-accent-yellow: #F39C12;
   --color-accent-orange: #E67E22;
 
-  /* Map to semantic variables for Shadcn/UI compatibility */
+  --shadow-chalk: 2px 2px 0 rgba(255, 255, 255, 0.3);
+  --shadow-chalk-lg: 4px 4px 0 rgba(255, 255, 255, 0.3);
+
+  /* Shadcn Semantic Mapping */
   --color-background: var(--color-chalkboard-dark);
   --color-foreground: var(--color-chalk-white);
-  
-  --color-card: var(--color-chalkboard-medium);
-  --color-card-foreground: var(--color-chalk-white);
-  
-  --color-popover: var(--color-chalkboard-medium);
-  --color-popover-foreground: var(--color-chalk-white);
-  
   --color-primary: var(--color-accent-green);
   --color-primary-foreground: var(--color-chalkboard-dark);
-  
   --color-secondary: var(--color-chalkboard-light);
   --color-secondary-foreground: var(--color-chalk-white);
-  
+  --color-card: var(--color-chalkboard-medium);
+  --color-card-foreground: var(--color-chalk-white);
   --color-muted: var(--color-chalkboard-light);
   --color-muted-foreground: #a0a0a0;
-  
   --color-accent: var(--color-accent-green);
   --color-accent-foreground: var(--color-chalkboard-dark);
-  
   --color-destructive: var(--color-accent-red);
   --color-destructive-foreground: var(--color-chalk-white);
-
   --color-border: var(--color-chalkboard-light);
   --color-input: var(--color-chalkboard-light);
   --color-ring: var(--color-accent-green);
-  
   --radius: 0.5rem;
 }
 
-:root {
-  /* No need to redefine here if using @theme inline for v4 variables, 
-     but keeping semantic mapping for shadcn components that might use hsl() */
-     
-  /* Redefining these as raw values might be needed if Shadcn uses HSL specifically.
-     For now, we rely on the @theme mapping above which binds the hex values to the semantic names.
-     If Shadcn components break because they expect HSL, we will convert.
-  */
+/* Emulate the user's @font-face request by mapping the name to our loaded Google Font */
+@font-face {
+  font-family: 'Cheveuxdange';
+  src: local('Permanent Marker'), url('https://fonts.gstatic.com/s/permanentmarker/v16/Fh4uPib9Iyv2ucM6pGQMWimMp004La2C.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @layer base {
   * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
     @apply border-border;
   }
+
   body {
-    @apply font-sans antialiased bg-background text-foreground;
-    /* Chalkboard texture SVG pattern */
-    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%231A1A1A" width="100" height="100"/><g fill-opacity="0.03"><circle fill="%23FFF" cx="50" cy="50" r="2"/></g></svg>');
-    background-size: 100px 100px;
+    @apply font-body text-chalk-white;
+    background-color: #1A1A1A;
+    background-image: url('/brand/bg-chalkboard.png');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    min-height: 100vh;
+  }
+
+  @media (max-width: 768px) {
+    body {
+      background-size: contain;
+      background-repeat: repeat-y;
+    }
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display;
+    @apply font-chalk;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  h1 {
+    @apply text-5xl md:text-6xl;
+  }
+
+  h2 {
+    @apply text-4xl md:text-5xl;
+  }
+
+  h3 {
+    @apply text-3xl md:text-4xl;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-accent-green text-chalkboard-dark font-display px-6 py-3 rounded-lg shadow-lg hover:bg-accent-green/90 transition-all cursor-pointer;
+    @apply bg-accent-green text-chalkboard-dark font-chalk text-xl px-8 py-4 rounded-xl;
+    @apply shadow-[3px_3px_0_rgba(248,248,248,0.3)] hover:shadow-[5px_5px_0_rgba(248,248,248,0.3)];
+    @apply transition-all duration-200 hover:translate-x-[-2px] hover:translate-y-[-2px] cursor-pointer;
+    @apply border-2 border-chalk-white/20;
   }
   
   .btn-secondary {
-    @apply border-2 border-chalk-white text-chalk-white font-display px-6 py-3 rounded-lg hover:bg-chalk-white/10 transition-all cursor-pointer;
+    @apply border-2 border-chalk-white text-chalk-white font-chalk text-xl px-8 py-4 rounded-xl;
+    @apply bg-chalkboard-medium/50 backdrop-blur-sm;
+    @apply hover:bg-chalk-white/10 transition-all duration-200 cursor-pointer;
+    @apply shadow-[2px_2px_0_rgba(248,248,248,0.2)];
   }
   
   .card-chalk {
-    @apply bg-card rounded-xl p-6 shadow-xl border border-border;
+    @apply bg-chalkboard-medium/80 backdrop-blur-sm rounded-2xl p-8;
+    @apply border-2 border-chalkboard-light;
+    @apply shadow-[4px_4px_0_rgba(0,0,0,0.3)];
   }
   
   .input-chalk {
-    @apply bg-secondary border-2 border-secondary focus:border-accent-green text-chalk-white px-4 py-3 rounded-lg outline-none transition-all w-full placeholder:text-white/30;
+    @apply bg-chalkboard-light/50 backdrop-blur-sm;
+    @apply border-2 border-chalkboard-light text-chalk-white;
+    @apply px-4 py-3 rounded-lg outline-none;
+    @apply focus:border-accent-green focus:ring-2 focus:ring-accent-green/30;
+    @apply transition-all duration-200;
+    @apply font-body text-lg w-full;
+  }
+
+  .input-chalk::placeholder {
+    @apply text-chalk-white/40;
+  }
+
+  .nav-item {
+    @apply flex flex-col items-center gap-1 text-chalk-white/60;
+    @apply hover:text-accent-green transition-colors duration-200;
+  }
+
+  .nav-item.active {
+    @apply text-accent-green;
+  }
+
+  .progress-bar {
+    @apply h-2 bg-chalkboard-light rounded-full overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-accent-green transition-all duration-500;
+    @apply shadow-[0_0_10px_rgba(93,185,168,0.5)];
+  }
+
+  .food-icon {
+    @apply w-16 h-16 object-contain filter drop-shadow-[2px_2px_4px_rgba(0,0,0,0.5)];
+  }
+
+  .chalk-text {
+    @apply font-chalk text-chalk-white;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .loading-spinner {
+    @apply animate-spin rounded-full border-4 border-chalkboard-light;
+    @apply border-t-accent-green w-12 h-12;
   }
 }
 
-@layer utilities {
-  .chalk-border {
-    border-style: solid;
-    border-width: 2px;
-    border-color: rgba(255, 255, 255, 0.7);
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    box-shadow: 2px 2px 0px rgba(255, 255, 255, 0.2);
+/* Animaciones personalizadas */
+@keyframes chalkWrite {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  
-  .chalk-effect {
-    filter: drop-shadow(0px 0px 1px rgba(255, 255, 255, 0.5));
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
+
+.animate-chalk-write {
+  animation: chalkWrite 0.5s ease-out forwards;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2D2D2D;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #5DB9A8;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4db8a8;
 }
