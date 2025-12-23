@@ -1,13 +1,11 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Permanent+Marker&display=swap');
 
 @theme inline {
   --font-chalk: 'Permanent Marker', cursive;
   --font-body: 'Nunito', sans-serif;
   --color-accent-green: #5DB9A8;
 }
-
-/* Emulate user's font import */
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Permanent+Marker&display=swap');
 
 @layer base {
   * {

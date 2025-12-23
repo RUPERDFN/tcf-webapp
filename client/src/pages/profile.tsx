@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useStore } from '@/lib/store';
-import api from '@/lib/api';
+import { useAuthStore } from '@/lib/stores/authStore';
+import { useOnboardingStore } from '@/lib/stores/onboardingStore';
+import { profileAPI } from '@/lib/api';
 import { Layout } from '@/components/layout';
 import { ChalkCard } from '@/components/chalk-card';
 import { ChalkButton } from '@/components/chalk-button';
@@ -12,23 +13,30 @@ import { X, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function ProfilePage() {
-  const { user, onboardingData, updateOnboarding } = useStore();
-  const [formData, setFormData] = useState(onboardingData || {});
+  const user = useAuthStore((state) => state.user);
+  const onboardingState = useOnboardingStore();
+  const [formData, setFormData] = useState<any>(onboardingState);
   const [allergyInput, setAllergyInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  // Sync local state with store on mount
   useEffect(() => {
-    if (onboardingData) {
-      setFormData(onboardingData);
-    }
-  }, [onboardingData]);
+    setFormData(onboardingState);
+  }, [onboardingState]);
 
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      await api.put('/profile', formData);
-      updateOnboarding(formData);
+      await profileAPI.update(formData);
+      
+      // Update store manually field by field or if store had a bulk update
+      // onboardingState only has setField.
+      // We'll just iterate for now or assume backend sync is enough, but UI needs store update.
+      Object.keys(formData).forEach(key => {
+         onboardingState.setField(key, formData[key]);
+      });
+
       toast({ title: "Profile Updated", description: "Your preferences have been saved." });
     } catch (error) {
       toast({ title: "Error", description: "Failed to save profile.", variant: "destructive" });
@@ -57,7 +65,7 @@ export default function ProfilePage() {
            <div className="grid gap-4">
              <div className="grid gap-2">
                <Label>Name</Label>
-               <Input value={user?.name || 'Chef'} disabled className="bg-white/5 border-white/10 text-white/50" />
+               <Input value={user?.id || 'Chef'} disabled className="bg-white/5 border-white/10 text-white/50" />
              </div>
              <div className="grid gap-2">
                <Label>Email</Label>
@@ -73,14 +81,14 @@ export default function ProfilePage() {
                  <Label>People</Label>
                  <Input 
                    type="number" 
-                   value={formData.people || 1} 
-                   onChange={(e) => setFormData({...formData, people: parseInt(e.target.value)})}
+                   value={formData.diners || 1} 
+                   onChange={(e) => setFormData({...formData, diners: parseInt(e.target.value)})}
                    className="bg-transparent border-white/20"
                  />
                </div>
                <div className="space-y-2">
                  <Label>Meals/Day</Label>
-                 <Select value={String(formData.mealsPerDay || '2')} onValueChange={(v) => setFormData({...formData, mealsPerDay: v})}>
+                 <Select value={String(formData.meals_per_day || '2')} onValueChange={(v) => setFormData({...formData, meals_per_day: parseInt(v)})}>
                   <SelectTrigger className="bg-transparent border-white/20">
                     <SelectValue />
                   </SelectTrigger>
@@ -95,12 +103,12 @@ export default function ProfilePage() {
 
             <div className="space-y-2">
                <Label>Diet Type</Label>
-               <Select value={formData.diet || 'omnivore'} onValueChange={(v) => setFormData({...formData, diet: v})}>
+               <Select value={formData.diet_type || 'omnivore'} onValueChange={(v) => setFormData({...formData, diet_type: v})}>
                   <SelectTrigger className="bg-transparent border-white/20">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="omnivore">Omnivore</SelectItem>
+                    <SelectItem value="omnivora">Omnivore</SelectItem>
                     <SelectItem value="vegetarian">Vegetarian</SelectItem>
                     <SelectItem value="vegan">Vegan</SelectItem>
                     <SelectItem value="keto">Keto</SelectItem>
