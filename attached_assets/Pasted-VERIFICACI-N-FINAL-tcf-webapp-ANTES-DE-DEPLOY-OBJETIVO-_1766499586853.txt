@@ -1,0 +1,123 @@
+VERIFICACIÓN FINAL tcf-webapp ANTES DE DEPLOY
+
+OBJETIVO: Asegurar que tcf-webapp está listo para producción.
+
+PASO 1: VERIFICAR package.json
+
+Abrir package.json y confirmar scripts:
+
+"scripts": {
+  "dev": "vite --host 0.0.0.0",
+  "build": "tsc && vite build",
+  "preview": "vite preview"
+}
+
+PASO 2: VERIFICAR ASSETS
+
+Opción A - Si copiaste a public/:
+ls -la public/bg/
+ls -la public/logos/
+ls -la public/icons/
+
+Opción B - Si usas GitHub CDN:
+Verificar que Landing.tsx tenga:
+const GITHUB_BASE = 'https://raw.githubusercontent.com/RUPERDFN/tcf-brand-master/main';
+
+PASO 3: VERIFICAR VARIABLES DE ENTORNO
+
+Ejecutar:
+cat .env
+
+Debe contener:
+VITE_API_BASE_URL=https://api.thecookflow.com
+VITE_CHEF_BASE_URL=https://chef.thecookflow.com
+
+PASO 4: VERIFICAR src/lib/api.ts
+
+Abrir src/lib/api.ts
+
+Debe tener NAMED EXPORTS:
+export const apiClient = ...
+export const chefClient = ...
+export const authAPI = ...
+export const profileAPI = ...
+export const menuAPI = ...
+
+NO debe tener:
+export default ...
+
+PASO 5: VERIFICAR IMPORTS EN PÁGINAS
+
+Buscar imports incorrectos:
+grep -r "import.*api.*from" src/pages/
+
+Todos deben ser NAMED IMPORTS:
+import { authAPI } from '../../lib/api';
+
+NINGUNO debe ser:
+import api from '../../lib/api';
+
+PASO 6: BUILD DE PRODUCCIÓN
+
+Ejecutar:
+npm run build
+
+Debe crear directorio dist/ sin errores.
+
+Verificar:
+ls -la dist/
+
+Debe contener:
+index.html
+assets/ (directorio con .js y .css)
+
+PASO 7: PREVIEW DE PRODUCCIÓN
+
+Ejecutar:
+npm run preview
+
+Visitar la URL que muestra.
+Verificar:
+✅ Página carga sin errores
+✅ Fondo de pizarra visible
+✅ Logo visible
+✅ Botones funcionan
+
+PASO 8: VERIFICAR .gitignore
+
+Cat .gitignore
+
+Debe incluir:
+node_modules/
+dist/
+.env
+.env.local
+*.log
+.DS_Store
+
+PASO 9: COMMIT FINAL
+
+git status
+
+Si dist/ aparece en cambios, verificar que .gitignore lo esté ignorando.
+
+git add .
+git commit -m "chore: final verification before production deploy"
+git push origin main
+
+PASO 10: VERIFICAR EN GITHUB
+
+Ir a: https://github.com/RUPERDFN/tcf-webapp
+
+Confirmar:
+✅ Último commit visible
+✅ dist/ NO está en el repo (debe estar en .gitignore)
+✅ src/ completo
+✅ public/ o assets visibles
+
+RESULTADO FINAL:
+✅ Build exitoso
+✅ Preview funciona
+✅ Variables de entorno configuradas
+✅ Pusheado a GitHub
+✅ LISTO PARA DEPLOY
