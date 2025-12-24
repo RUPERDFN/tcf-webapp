@@ -1,7 +1,5 @@
 import { useLocation } from 'wouter';
-import { useOnboardingStore } from '../../lib/stores/onboardingStore';
-import Button from '../../components/ui/Button'; 
-import Input from '../../components/ui/Input'; 
+import { useOnboardingStore } from '../../lib/stores/onboardingStore'; 
 
 export default function Step1Budget() {
   const [, setLocation] = useLocation();

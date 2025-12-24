@@ -2,9 +2,9 @@ import axios from "axios";
 import { useAuthStore } from "./stores/authStore";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+  import.meta.env.VITE_API_BASE_URL || "";
 const CHEF_BASE_URL =
-  import.meta.env.VITE_CHEF_BASE_URL || "http://localhost:8000";
+  import.meta.env.VITE_CHEF_BASE_URL || "https://chef.thecookflow.com";
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

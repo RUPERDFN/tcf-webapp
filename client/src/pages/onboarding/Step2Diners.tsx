@@ -1,6 +1,6 @@
 import { useLocation } from 'wouter';
 import { useOnboardingStore } from '../../lib/stores/onboardingStore';
-import Button from '../../components/ui/Button';
+import { Button } from '@/components/ui/button';
 
 export default function Step2Diners() {
   const [, setLocation] = useLocation();
