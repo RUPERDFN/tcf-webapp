@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useLocation, Link } from 'wouter';
 import { useAuthStore } from '../../lib/stores/authStore';
 import { authAPI } from '../../lib/api';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import toast from 'react-hot-toast';
 
 export default function Login() {
@@ -31,31 +32,44 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="card-chalk w-full max-w-md">
-        <h2 className="text-4xl mb-6 text-center text-accent-green">Iniciar Sesión</h2>
+      <div className="card-tcf w-full max-w-md fade-in">
+        <div className="text-center mb-8">
+          <img src="/logos/logo.png" alt="TheCookFlow" className="w-16 h-16 mx-auto mb-2" />
+          <h2 className="text-4xl font-chalk text-accent-green">Iniciar Sesión</h2>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            type="email"
-            label="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            placeholder="chef@example.com"
-          />
-          <Input
-            type="password"
-            label="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            placeholder="••••••••"
-          />
-          <Button type="submit" className="w-full" disabled={loading}>
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-white">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="chef@example.com"
+              className="input-tcf"
+              data-testid="input-email"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-white">Contraseña</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="••••••••"
+              className="input-tcf"
+              data-testid="input-password"
+            />
+          </div>
+          <Button type="submit" className="w-full btn-siguiente" disabled={loading} data-testid="button-submit">
             {loading ? 'Cargando...' : 'Entrar'}
           </Button>
         </form>
-        <p className="text-center mt-4">
-          ¿No tienes cuenta? <Link href="/register"><span className="text-accent-green cursor-pointer hover:underline">Regístrate</span></Link>
+        <p className="text-center mt-4 text-gray-300">
+          ¿No tienes cuenta? <Link href="/register"><span className="text-accent-green cursor-pointer hover:underline" data-testid="link-register">Regístrate</span></Link>
         </p>
       </div>
     </div>
