@@ -13,6 +13,7 @@ import LoadingPage from "@/pages/loading";
 import DashboardPage from "@/pages/dashboard";
 import ShoppingPage from "@/pages/shopping";
 import RewardsPage from "@/pages/rewards";
+import ProfilePage from "@/pages/profile";
 import { AchievementToast } from "@/components/gamification";
 import { useAuthStore } from "@/lib/stores/authStore";
 
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/shopping" component={ShoppingPage} />
       <Route path="/rewards" component={RewardsPage} />
+      <Route path="/profile" component={ProfilePage} />
       
       <Route component={NotFound} />
     </Switch>
