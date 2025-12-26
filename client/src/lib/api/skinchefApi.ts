@@ -94,12 +94,21 @@ export async function getSubstitutions(
   return response.json();
 }
 
+export interface MenuResponse {
+  menu: {
+    days: Array<{
+      day: string;
+      meals: Record<string, { name: string; time: string; ingredients: string[] }>;
+    }>;
+  };
+  shopping_list: Array<{ name: string; quantity: string; category: string }>;
+}
+
 export function useGenerateMenu() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ userId, profile, days }: { userId: string; profile: ProfileData; days: number }) =>
-      generateMenu(userId, profile, days),
+  return useMutation<MenuResponse, Error, { userId: string; profile: ProfileData; days: number }>({
+    mutationFn: ({ userId, profile, days }) => generateMenu(userId, profile, days),
     onMutate: () => {
       toast.loading('Generando tu menú personalizado...', { id: 'generate-menu' });
     },
@@ -111,28 +120,29 @@ export function useGenerateMenu() {
     onError: (error: Error) => {
       toast.error(error.message || 'Error al generar el menú', { id: 'generate-menu' });
     },
+    onSettled: () => {
+      toast.dismiss('generate-menu');
+    },
   });
+}
+
+export interface SwapMealResponse {
+  new_meal: { name: string; time: string; ingredients: string[] };
 }
 
 export function useSwapMeal() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ 
-      userId, 
-      profile, 
-      menu, 
-      dayIndex, 
-      mealKey, 
-      constraints 
-    }: { 
-      userId: string; 
-      profile: ProfileData; 
-      menu: any; 
-      dayIndex: number; 
-      mealKey: string; 
-      constraints?: string;
-    }) => swapMeal(userId, profile, menu, dayIndex, mealKey, constraints),
+  return useMutation<SwapMealResponse, Error, { 
+    userId: string; 
+    profile: ProfileData; 
+    menu: any; 
+    dayIndex: number; 
+    mealKey: string; 
+    constraints?: string;
+  }>({
+    mutationFn: ({ userId, profile, menu, dayIndex, mealKey, constraints }) => 
+      swapMeal(userId, profile, menu, dayIndex, mealKey, constraints),
     onMutate: () => {
       toast.loading('Buscando alternativa...', { id: 'swap-meal' });
     },
@@ -144,22 +154,25 @@ export function useSwapMeal() {
     onError: (error: Error) => {
       toast.error(error.message || 'Error al cambiar la comida', { id: 'swap-meal' });
     },
+    onSettled: () => {
+      toast.dismiss('swap-meal');
+    },
   });
 }
 
+export interface SubstitutionsResponse {
+  substitutes: Array<{ name: string; reason: string; healthier: boolean }>;
+}
+
 export function useSubstitutions() {
-  return useMutation({
-    mutationFn: ({ 
-      userId, 
-      profile, 
-      ingredient, 
-      reason 
-    }: { 
-      userId: string; 
-      profile: ProfileData; 
-      ingredient: string; 
-      reason: string;
-    }) => getSubstitutions(userId, profile, ingredient, reason),
+  return useMutation<SubstitutionsResponse, Error, { 
+    userId: string; 
+    profile: ProfileData; 
+    ingredient: string; 
+    reason: string;
+  }>({
+    mutationFn: ({ userId, profile, ingredient, reason }) => 
+      getSubstitutions(userId, profile, ingredient, reason),
     onMutate: () => {
       toast.loading('Buscando sustitutos...', { id: 'substitutions' });
     },
@@ -169,6 +182,9 @@ export function useSubstitutions() {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Error al buscar sustitutos', { id: 'substitutions' });
+    },
+    onSettled: () => {
+      toast.dismiss('substitutions');
     },
   });
 }
