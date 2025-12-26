@@ -12,6 +12,8 @@ import OnboardingFlow from "@/pages/onboarding/OnboardingFlow";
 import LoadingPage from "@/pages/loading";
 import DashboardPage from "@/pages/dashboard";
 import ShoppingPage from "@/pages/shopping";
+import RewardsPage from "@/pages/rewards";
+import { AchievementToast } from "@/components/gamification";
 import { useAuthStore } from "@/lib/stores/authStore";
 
 // Protected Route Wrapper
@@ -34,6 +36,7 @@ function Router() {
       <Route path="/loading" component={LoadingPage} />
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/shopping" component={ShoppingPage} />
+      <Route path="/rewards" component={RewardsPage} />
       
       <Route component={NotFound} />
     </Switch>
@@ -51,6 +54,7 @@ function App() {
             border: '1px solid #404040'
          }
       }} />
+      <AchievementToast />
       <Router />
     </QueryClientProvider>
   );
