@@ -16,6 +16,7 @@ export interface OnboardingData {
 
 interface OnboardingStore {
   currentStep: number;
+  completed: boolean;
   data: OnboardingData;
   setStep: (step: number) => void;
   nextStep: () => void;
@@ -23,6 +24,7 @@ interface OnboardingStore {
   updateData: (partial: Partial<OnboardingData>) => void;
   resetOnboarding: () => void;
   isComplete: () => boolean;
+  setCompleted: (value: boolean) => void;
   setField: (field: string, value: any) => void;
 }
 
@@ -41,6 +43,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
   persist(
     (set, get) => ({
       currentStep: 1,
+      completed: false,
       data: { ...initialData },
 
       setStep: (step: number) => set({ currentStep: step }),
@@ -59,8 +62,11 @@ export const useOnboardingStore = create<OnboardingStore>()(
 
       resetOnboarding: () => set({
         currentStep: 1,
+        completed: false,
         data: { ...initialData },
       }),
+
+      setCompleted: (value: boolean) => set({ completed: value }),
 
       isComplete: () => {
         const { data } = get();
