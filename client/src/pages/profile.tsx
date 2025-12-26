@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/lib/stores/authStore';
-import { useOnboardingStore } from '@/lib/stores/onboardingStore';
+import { useOnboardingStore, type OnboardingData, type DietType } from '@/lib/stores/onboardingStore';
 import { profileAPI } from '@/lib/api';
 import { Layout } from '@/components/layout';
 import { ChalkCard } from '@/components/chalk-card';
@@ -14,59 +14,57 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function ProfilePage() {
   const user = useAuthStore((state) => state.user);
-  const onboardingState = useOnboardingStore();
-  const [formData, setFormData] = useState<any>(onboardingState);
+  const { data, updateData } = useOnboardingStore();
+  const [formData, setFormData] = useState<OnboardingData>(data);
   const [allergyInput, setAllergyInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Sync local state with store on mount
   useEffect(() => {
-    setFormData(onboardingState);
-  }, [onboardingState]);
+    setFormData(data);
+  }, [data]);
 
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      await profileAPI.update(formData);
-      
-      // Update store manually field by field or if store had a bulk update
-      // onboardingState only has setField.
-      // We'll just iterate for now or assume backend sync is enough, but UI needs store update.
-      Object.keys(formData).forEach(key => {
-         onboardingState.setField(key, formData[key]);
+      await profileAPI.update({
+        budget_eur_week: formData.budgetWeekly,
+        diners: formData.diners,
+        meals_per_day: formData.mealsPerDay,
+        days: formData.daysPerWeek,
+        diet_type: formData.dietType,
+        allergies: formData.allergies,
+        disliked_foods: formData.dislikes,
+        pantry_items: formData.pantryItems.join(', '),
       });
-
-      toast({ title: "Profile Updated", description: "Your preferences have been saved." });
+      
+      updateData(formData);
+      toast({ title: "Perfil Actualizado", description: "Tus preferencias han sido guardadas." });
     } catch (error) {
-      toast({ title: "Error", description: "Failed to save profile.", variant: "destructive" });
+      toast({ title: "Error", description: "Error al guardar el perfil.", variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
   };
 
   const addAllergy = () => {
-    if (allergyInput && !formData.allergies?.includes(allergyInput)) {
-      setFormData({ ...formData, allergies: [...(formData.allergies || []), allergyInput] });
+    if (allergyInput && !formData.allergies.includes(allergyInput)) {
+      setFormData({ ...formData, allergies: [...formData.allergies, allergyInput] });
       setAllergyInput('');
     }
   };
 
   const removeAllergy = (a: string) => {
-    setFormData({ ...formData, allergies: formData.allergies.filter((i: string) => i !== a) });
+    setFormData({ ...formData, allergies: formData.allergies.filter((i) => i !== a) });
   };
 
   return (
     <Layout>
       <div className="max-w-2xl mx-auto space-y-6">
-        <h2 className="text-3xl font-display">Chef Profile</h2>
+        <h2 className="text-3xl font-display">Perfil del Chef</h2>
         
-        <ChalkCard title="Account Details">
+        <ChalkCard title="Datos de Cuenta">
            <div className="grid gap-4">
-             <div className="grid gap-2">
-               <Label>Name</Label>
-               <Input value={user?.id || 'Chef'} disabled className="bg-white/5 border-white/10 text-white/50" />
-             </div>
              <div className="grid gap-2">
                <Label>Email</Label>
                <Input value={user?.email || 'chef@example.com'} disabled className="bg-white/5 border-white/10 text-white/50" />
@@ -74,61 +72,95 @@ export default function ProfilePage() {
            </div>
         </ChalkCard>
 
-        <ChalkCard title="Cooking Preferences">
+        <ChalkCard title="Preferencias de Cocina">
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
                <div className="space-y-2">
-                 <Label>People</Label>
+                 <Label>Comensales</Label>
                  <Input 
                    type="number" 
                    value={formData.diners || 1} 
-                   onChange={(e) => setFormData({...formData, diners: parseInt(e.target.value)})}
+                   onChange={(e) => setFormData({...formData, diners: parseInt(e.target.value) || 1})}
                    className="bg-transparent border-white/20"
+                   min={1}
+                   max={10}
+                   data-testid="input-diners"
                  />
                </div>
                <div className="space-y-2">
-                 <Label>Meals/Day</Label>
-                 <Select value={String(formData.meals_per_day || '2')} onValueChange={(v) => setFormData({...formData, meals_per_day: parseInt(v)})}>
+                 <Label>Comidas/Día</Label>
+                 <Select value={String(formData.mealsPerDay || 3)} onValueChange={(v) => setFormData({...formData, mealsPerDay: parseInt(v)})}>
                   <SelectTrigger className="bg-transparent border-white/20">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">1</SelectItem>
-                    <SelectItem value="2">2</SelectItem>
                     <SelectItem value="3">3</SelectItem>
+                    <SelectItem value="4">4</SelectItem>
+                    <SelectItem value="5">5</SelectItem>
+                  </SelectContent>
+                </Select>
+               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+               <div className="space-y-2">
+                 <Label>Presupuesto Semanal (€)</Label>
+                 <Input 
+                   type="number" 
+                   value={formData.budgetWeekly || 50} 
+                   onChange={(e) => setFormData({...formData, budgetWeekly: parseInt(e.target.value) || 50})}
+                   className="bg-transparent border-white/20"
+                   min={20}
+                   max={200}
+                   data-testid="input-budget"
+                 />
+               </div>
+               <div className="space-y-2">
+                 <Label>Días/Semana</Label>
+                 <Select value={String(formData.daysPerWeek || 5)} onValueChange={(v) => setFormData({...formData, daysPerWeek: parseInt(v)})}>
+                  <SelectTrigger className="bg-transparent border-white/20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1,2,3,4,5,6,7].map(d => (
+                      <SelectItem key={d} value={String(d)}>{d}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                </div>
             </div>
 
             <div className="space-y-2">
-               <Label>Diet Type</Label>
-               <Select value={formData.diet_type || 'omnivore'} onValueChange={(v) => setFormData({...formData, diet_type: v})}>
+               <Label>Tipo de Dieta</Label>
+               <Select value={formData.dietType || 'omnivora'} onValueChange={(v) => setFormData({...formData, dietType: v as DietType})}>
                   <SelectTrigger className="bg-transparent border-white/20">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="omnivora">Omnivore</SelectItem>
-                    <SelectItem value="vegetarian">Vegetarian</SelectItem>
-                    <SelectItem value="vegan">Vegan</SelectItem>
-                    <SelectItem value="keto">Keto</SelectItem>
+                    <SelectItem value="omnivora">Omnívora</SelectItem>
+                    <SelectItem value="vegetariana">Vegetariana</SelectItem>
+                    <SelectItem value="vegana">Vegana</SelectItem>
+                    <SelectItem value="pescetariana">Pescetariana</SelectItem>
+                    <SelectItem value="sin_gluten">Sin Gluten</SelectItem>
                   </SelectContent>
                 </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Allergies</Label>
+              <Label>Alergias</Label>
               <div className="flex gap-2">
                 <Input 
                   value={allergyInput} 
                   onChange={(e) => setAllergyInput(e.target.value)}
-                  placeholder="Add allergy..." 
+                  placeholder="Añadir alergia..." 
                   className="bg-transparent border-white/20"
+                  onKeyPress={(e) => e.key === 'Enter' && addAllergy()}
+                  data-testid="input-allergy"
                 />
-                <ChalkButton type="button" onClick={addAllergy} variant="secondary">Add</ChalkButton>
+                <ChalkButton type="button" onClick={addAllergy} variant="secondary">Añadir</ChalkButton>
               </div>
               <div className="flex gap-2 flex-wrap mt-2">
-                {formData.allergies?.map((a: string) => (
+                {formData.allergies?.map((a) => (
                   <Badge key={a} variant="secondary" className="flex items-center gap-1">
                     {a} <X className="w-3 h-3 cursor-pointer" onClick={() => removeAllergy(a)} />
                   </Badge>
@@ -136,8 +168,8 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <ChalkButton onClick={handleSave} isLoading={isLoading} className="w-full">
-              <Save className="mr-2 h-4 w-4" /> Save Preferences
+            <ChalkButton onClick={handleSave} isLoading={isLoading} className="w-full" data-testid="button-save">
+              <Save className="mr-2 h-4 w-4" /> Guardar Preferencias
             </ChalkButton>
           </div>
         </ChalkCard>

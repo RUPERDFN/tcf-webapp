@@ -1,19 +1,19 @@
 import { useLocation } from 'wouter';
-import { useOnboardingStore } from '../../lib/stores/onboardingStore'; 
+import { useOnboardingStore } from '../../lib/stores/onboardingStore';
 
 export default function Step1Budget() {
   const [, setLocation] = useLocation();
-  const { budget_eur_week, setField } = useOnboardingStore();
+  const { data, updateData, nextStep } = useOnboardingStore();
 
   const handleNext = () => {
-    if (budget_eur_week >= 30 && budget_eur_week <= 500) {
+    if (data.budgetWeekly >= 20 && data.budgetWeekly <= 200) {
+      nextStep();
       setLocation('/onboarding/2');
     }
   };
 
   return (
     <div className="card-tcf fade-in">
-      {/* Logo real pequeño */}
       <div className="text-center mb-8">
         <img 
           src="/logos/logo.png" 
@@ -23,7 +23,6 @@ export default function Step1Budget() {
         <h3 className="text-2xl font-chalk">The CookFlow</h3>
       </div>
 
-      {/* Pregunta */}
       <h2 className="text-3xl md:text-4xl font-chalk text-center mb-8">
         Presupuesto semanal
       </h2>
@@ -32,28 +31,28 @@ export default function Step1Budget() {
         ¿Cuánto quieres gastar en comida esta semana?
       </p>
 
-      {/* Input */}
       <div className="mb-8">
         <input
           type="number"
           placeholder="Ej: 50€"
-          value={budget_eur_week || ''}
-          onChange={(e) => setField('budget_eur_week', parseInt(e.target.value) || 0)}
-          min={30}
-          max={500}
+          value={data.budgetWeekly || ''}
+          onChange={(e) => updateData({ budgetWeekly: parseInt(e.target.value) || 0 })}
+          min={20}
+          max={200}
           className="input-tcf text-center font-bold text-3xl"
+          data-testid="input-budget"
         />
         <p className="text-gray-400 text-sm mt-2 text-center">
-          Entre 30€ y 500€ por semana
+          Entre 20€ y 200€ por semana
         </p>
       </div>
 
-      {/* Botón */}
       <div className="flex justify-center">
         <button 
           onClick={handleNext} 
-          disabled={budget_eur_week < 30 || budget_eur_week > 500}
+          disabled={data.budgetWeekly < 20 || data.budgetWeekly > 200}
           className="btn-siguiente w-full"
+          data-testid="button-next"
         >
           Siguiente
         </button>
