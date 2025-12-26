@@ -5,6 +5,8 @@ import Step2Diners from './Step2Diners';
 import Step3Meals from './Step3Meals';
 import Step4Days from './Step4Days';
 import Step5Diet from './Step5Diet';
+import Step6Allergies from './Step6Allergies';
+import Step7Dislikes from './Step7Dislikes';
 
 const PlaceholderStep = ({ step, title }: { step: number, title: string }) => {
     return <div className="text-center p-10 card-tcf"><h2 className="text-2xl">{title}</h2></div>;
@@ -38,8 +40,8 @@ export default function OnboardingFlow() {
           <Route path="/onboarding/3" component={Step3Meals} />
           <Route path="/onboarding/4" component={Step4Days} />
           <Route path="/onboarding/5" component={Step5Diet} />
-          <Route path="/onboarding/6"><PlaceholderStep step={6} title="Alergias" /></Route>
-          <Route path="/onboarding/7"><PlaceholderStep step={7} title="Alimentos no deseados" /></Route>
+          <Route path="/onboarding/6" component={Step6Allergies} />
+          <Route path="/onboarding/7" component={Step7Dislikes} />
           <Route path="/onboarding/8"><PlaceholderStep step={8} title="Despensa" /></Route>
           <Route path="/onboarding/:rest*"><Redirect to="/onboarding/1" /></Route>
         </Switch>
