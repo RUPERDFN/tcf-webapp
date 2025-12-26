@@ -1,10 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Permanent+Marker&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Indie+Flower&display=swap');
 @import "tailwindcss";
 
+:root {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-card: #1f1f3a;
+  --bg-chalkboard: #2d2d44;
+  --text-primary: #ffffff;
+  --text-chalk: #f5f5f5;
+  --text-muted: #888888;
+  --accent-primary: #5db9a8;
+  --accent-hover: #4da898;
+  --accent-red: #e74c3c;
+  --accent-green: #27ae60;
+  --accent-yellow: #f1c40f;
+}
+
 @theme inline {
-  --font-chalk: 'Permanent Marker', cursive;
-  --font-body: 'Nunito', sans-serif;
-  --color-accent-green: #5DB9A8;
+  --font-chalk: 'Caveat', cursive;
+  --font-body: 'Inter', sans-serif;
+  --font-decorative: 'Indie Flower', cursive;
+  --color-accent-green: #5db9a8;
+  --color-accent-hover: #4da898;
+  --color-bg-primary: #1a1a2e;
+  --color-bg-card: #1f1f3a;
+  --color-text-chalk: #f5f5f5;
+  --color-text-muted: #888888;
 }
 
 @layer base {
@@ -15,8 +36,9 @@
   }
 
   body {
-    @apply font-body text-white;
-    background: #1a1a1a;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-primary);
     background-image: url('/bg/bg.png');
     background-size: cover;
     background-attachment: fixed;
@@ -31,15 +53,52 @@
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-chalk text-white;
+    font-family: 'Caveat', cursive;
+    color: var(--text-chalk);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   }
 }
 
 @layer components {
+  .bg-chalkboard {
+    background: var(--bg-primary);
+  }
+
+  .text-chalk {
+    color: var(--text-chalk);
+    font-family: 'Caveat', cursive;
+  }
+
+  .text-decorative {
+    font-family: 'Indie Flower', cursive;
+    color: var(--text-chalk);
+  }
+
+  .btn-tcf {
+    background: var(--accent-primary);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-tcf:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+
+  .btn-tcf:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
   .btn-siguiente {
     @apply relative px-12 py-4 text-white font-bold text-xl;
-    background: linear-gradient(135deg, #5DB9A8 0%, #4db8a8 100%);
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-hover) 100%);
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -67,15 +126,34 @@
     @apply transition-all duration-300 cursor-pointer;
   }
 
+  .card-tcf {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
   .input-tcf {
-    @apply w-full px-6 py-4 text-white border-2 border-white rounded-2xl;
-    @apply bg-black/30 backdrop-blur-sm;
-    @apply outline-none focus:border-accent-green focus:bg-black/50;
-    @apply transition-all text-lg;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    padding: 12px 16px;
+    width: 100%;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .input-tcf:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    background: rgba(255, 255, 255, 0.08);
   }
 
   .input-tcf::placeholder {
-    @apply text-gray-400;
+    color: var(--text-muted);
   }
 
   .pill {
@@ -88,18 +166,11 @@
     @apply bg-white text-black;
   }
 
-  .card-tcf {
-    @apply bg-black/60 backdrop-blur-md p-8 rounded-3xl;
-    @apply border border-white/10;
-    @apply max-w-md w-full mx-auto;
-    @apply shadow-2xl;
-  }
-
   .number-selector {
     @apply w-16 h-16 flex items-center justify-center;
     @apply border-2 border-white rounded-xl text-2xl font-bold;
     @apply cursor-pointer hover:bg-white hover:text-black transition-all;
-    @apply bg-black/40;
+    background: rgba(0, 0, 0, 0.4);
   }
 
   .number-selector.selected {
@@ -108,30 +179,45 @@
 
   .bottom-nav {
     @apply fixed bottom-0 left-0 right-0;
-    @apply bg-black/80 backdrop-blur-md border-t-2 border-white/10;
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     @apply flex justify-around items-center h-20 px-4;
   }
 
   .nav-item {
-    @apply flex flex-col items-center gap-1 text-gray-400;
+    @apply flex flex-col items-center gap-1;
+    color: var(--text-muted);
     @apply hover:text-accent-green transition-colors cursor-pointer py-2;
   }
 
   .nav-item.active {
-    @apply text-accent-green;
+    color: var(--accent-primary);
   }
 
   .progress-bar {
-    @apply h-2 bg-white/20 rounded-full overflow-hidden;
+    @apply h-2 rounded-full overflow-hidden;
+    background: rgba(255, 255, 255, 0.2);
   }
 
   .progress-fill {
-    @apply h-full bg-accent-green transition-all duration-500;
+    @apply h-full transition-all duration-500;
+    background: var(--accent-primary);
   }
 
   .loading-spinner {
-    @apply w-12 h-12 border-4 border-white/20 border-t-accent-green rounded-full;
+    @apply w-12 h-12 border-4 rounded-full;
+    border-color: rgba(255, 255, 255, 0.2);
+    border-top-color: var(--accent-primary);
     animation: spin 1s linear infinite;
+  }
+
+  .card-chalk {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
   }
 }
 
