@@ -9,8 +9,9 @@ import Landing from "@/pages/Landing";
 import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
 import OnboardingFlow from "@/pages/onboarding/OnboardingFlow";
-import LoadingPage from "@/pages/loading"; // Reusing existing
-import DashboardPage from "@/pages/dashboard"; // Reusing existing dashboard for now
+import LoadingPage from "@/pages/loading";
+import DashboardPage from "@/pages/dashboard";
+import ShoppingPage from "@/pages/shopping";
 import { useAuthStore } from "@/lib/stores/authStore";
 
 // Protected Route Wrapper
@@ -32,6 +33,7 @@ function Router() {
       
       <Route path="/loading" component={LoadingPage} />
       <Route path="/dashboard" component={DashboardPage} />
+      <Route path="/shopping" component={ShoppingPage} />
       
       <Route component={NotFound} />
     </Switch>
