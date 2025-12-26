@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDashboardStore } from '@/lib/stores/dashboardStore';
 import { useOnboardingStore } from '@/lib/stores/onboardingStore';
+import { useGamificationStore, LEVELS } from '@/lib/stores/gamificationStore';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { PointsDisplay, StreakCounter, LevelBadge } from '@/components/gamification';
 
 const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 const dayFullNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -34,13 +36,21 @@ const getMealTime = (meal: string) => {
 export default function DashboardPage() {
   const { menu, shoppingList } = useDashboardStore();
   const { data: onboardingData } = useOnboardingStore();
+  const { points, streak, level, checkDailyLogin, getLevel, getLevelProgress } = useGamificationStore();
   const [, setLocation] = useLocation();
   const [activeNav, setActiveNav] = useState('home');
+
+  useEffect(() => {
+    checkDailyLogin();
+  }, []);
 
   const today = new Date();
   const todayName = dayFullNames[today.getDay()];
   const todayDate = today.getDate();
   const todayMonth = monthNames[today.getMonth()];
+
+  const currentLevel = getLevel();
+  const levelProgress = getLevelProgress();
 
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
@@ -62,9 +72,6 @@ export default function DashboardPage() {
   const pendingItems = shoppingList.filter(item => !item.checked).slice(0, 5);
   const totalPending = shoppingList.filter(item => !item.checked).length;
 
-  const userPoints = 1250;
-  const currentStreak = 5;
-
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white">
       <header className="sticky top-0 z-50 bg-[#1a1a1a]/95 backdrop-blur border-b border-white/10">
@@ -77,9 +84,9 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 text-sm font-bold">
-              🔥 {userPoints.toLocaleString()} pts
-            </div>
+            <button onClick={() => setLocation('/rewards')} data-testid="button-points">
+              <PointsDisplay size="sm" />
+            </button>
             <button className="relative" data-testid="button-notifications">
               <span className="text-2xl">🔔</span>
               <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs flex items-center justify-center">2</span>
@@ -223,38 +230,42 @@ export default function DashboardPage() {
           )}
         </section>
 
-        <section className="card-tcf bg-gradient-to-r from-orange-500/10 to-yellow-500/10 border-orange-500/30">
+        <button 
+          onClick={() => setLocation('/rewards')}
+          className="card-tcf bg-gradient-to-r from-orange-500/10 to-yellow-500/10 border-orange-500/30 w-full text-left hover:border-orange-500/50 transition-colors"
+          data-testid="button-rewards"
+        >
           <h2 className="text-xl text-chalk mb-4">🏆 SkinChef Rewards</h2>
           
           <div className="grid grid-cols-3 gap-4 text-center">
             <div className="p-3 rounded-xl bg-white/5">
-              <div className="text-3xl mb-1">🔥</div>
-              <div className="text-2xl font-bold text-orange-400">{currentStreak}</div>
-              <div className="text-xs text-gray-400">días seguidos</div>
+              <StreakCounter size="sm" />
             </div>
             <div className="p-3 rounded-xl bg-white/5">
               <div className="text-3xl mb-1">⭐</div>
-              <div className="text-2xl font-bold text-yellow-400">{userPoints.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-yellow-400">{points.toLocaleString()}</div>
               <div className="text-xs text-gray-400">puntos totales</div>
             </div>
             <div className="p-3 rounded-xl bg-white/5">
-              <div className="text-3xl mb-1">🎯</div>
-              <div className="text-sm font-bold text-accent-green">Próximo</div>
-              <div className="text-xs text-gray-400">Chef Experto</div>
+              <LevelBadge size="sm" showName={false} />
+              <div className="text-xs text-gray-400 mt-1">Nivel {level}</div>
             </div>
           </div>
 
           <div className="mt-4 p-3 rounded-xl bg-white/5 flex items-center gap-3">
-            <div className="text-2xl">🏅</div>
+            <div className="text-2xl">{currentLevel.icon}</div>
             <div className="flex-1">
-              <div className="text-sm font-bold text-white">Chef Principiante</div>
+              <div className="text-sm font-bold text-white">{currentLevel.name}</div>
               <div className="h-2 bg-white/10 rounded-full mt-1 overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-orange-500 to-yellow-500 w-[65%]" />
+                <div 
+                  className="h-full bg-gradient-to-r from-orange-500 to-yellow-500 transition-all" 
+                  style={{ width: `${levelProgress}%` }}
+                />
               </div>
             </div>
-            <div className="text-sm text-gray-400">65%</div>
+            <div className="text-sm text-gray-400">{levelProgress}%</div>
           </div>
-        </section>
+        </button>
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-white/10 z-50">

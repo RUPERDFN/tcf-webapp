@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useOnboardingStore } from '../../lib/stores/onboardingStore';
+import { useGamificationStore, POINT_VALUES } from '@/lib/stores/gamificationStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -57,9 +58,13 @@ export default function Step8Pantry() {
     }
   };
 
+  const { addPoints, checkDailyLogin } = useGamificationStore();
+
   const handleComplete = () => {
     setCompleted(true);
     nextStep();
+    addPoints(POINT_VALUES.COMPLETE_ONBOARDING, 'Completar onboarding');
+    checkDailyLogin();
     setLocation('/loading');
   };
 
