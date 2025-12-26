@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { useAuthStore } from '@/lib/stores/authStore';
 import { useOnboardingStore, type OnboardingData, type DietType } from '@/lib/stores/onboardingStore';
@@ -24,13 +24,18 @@ const DIETS = [
 const COMMON_ALLERGIES = ['Gluten', 'Lactosa', 'Frutos secos', 'Mariscos', 'Huevo', 'Soja'];
 
 function useDebounce(callback: () => void, delay: number) {
-  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
+  const timerRef = React.useRef<NodeJS.Timeout | null>(null);
+  
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
   
   return useCallback(() => {
-    if (timer) clearTimeout(timer);
-    const newTimer = setTimeout(callback, delay);
-    setTimer(newTimer);
-  }, [callback, delay, timer]);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(callback, delay);
+  }, [callback, delay]);
 }
 
 export default function ProfilePage() {
@@ -65,8 +70,10 @@ export default function ProfilePage() {
         pantry_items: formData.pantryItems.join(', '),
       });
       updateData(formData);
+      toast.success('Guardado', { duration: 1500 });
     } catch (error) {
       console.error('Error saving profile:', error);
+      toast.error('Error al guardar');
     }
   }, [formData, updateData]);
 
@@ -274,22 +281,22 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <section className="card-tcf">
+        <section className="card-tcf" data-testid="section-stats">
           <h2 className="text-lg text-chalk mb-4">📊 Estadísticas</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl bg-white/5 text-center">
+            <div className="p-4 rounded-xl bg-white/5 text-center" data-testid="stat-menus">
               <div className="text-2xl font-bold text-accent-green">12</div>
               <div className="text-xs text-gray-400">Menús generados</div>
             </div>
-            <div className="p-4 rounded-xl bg-white/5 text-center">
+            <div className="p-4 rounded-xl bg-white/5 text-center" data-testid="stat-recipes">
               <div className="text-2xl font-bold text-yellow-400">87</div>
               <div className="text-xs text-gray-400">Recetas completadas</div>
             </div>
-            <div className="p-4 rounded-xl bg-white/5 text-center">
+            <div className="p-4 rounded-xl bg-white/5 text-center" data-testid="stat-savings">
               <div className="text-2xl font-bold text-green-400">~120€</div>
               <div className="text-xs text-gray-400">Dinero ahorrado</div>
             </div>
-            <div className="p-4 rounded-xl bg-white/5 text-center">
+            <div className="p-4 rounded-xl bg-white/5 text-center" data-testid="stat-points">
               <div className="text-2xl font-bold text-orange-400">{points.toLocaleString()}</div>
               <div className="text-xs text-gray-400">Puntos totales</div>
             </div>
@@ -335,13 +342,13 @@ export default function ProfilePage() {
               />
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-xl bg-white/5">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-white/5" data-testid="setting-language">
               <div className="flex items-center gap-3">
                 <Globe className="w-5 h-5 text-gray-400" />
                 <span>Idioma</span>
               </div>
               <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger className="w-32 bg-transparent border-white/20">
+                <SelectTrigger className="w-32 bg-transparent border-white/20" data-testid="select-language">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -385,24 +392,33 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <section className="card-tcf">
+        <section className="card-tcf" data-testid="section-legal">
           <h2 className="text-lg text-chalk mb-4">📜 Legal</h2>
           <div className="space-y-2">
-            <button className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+            <button 
+              className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+              data-testid="button-privacy"
+            >
               <div className="flex items-center gap-3">
                 <Shield className="w-5 h-5 text-gray-400" />
                 <span>Política de privacidad</span>
               </div>
               <ChevronRight className="w-5 h-5 text-gray-400" />
             </button>
-            <button className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+            <button 
+              className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+              data-testid="button-terms"
+            >
               <div className="flex items-center gap-3">
                 <FileText className="w-5 h-5 text-gray-400" />
                 <span>Términos de uso</span>
               </div>
               <ChevronRight className="w-5 h-5 text-gray-400" />
             </button>
-            <button className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+            <button 
+              className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+              data-testid="button-contact"
+            >
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-gray-400" />
                 <span>Contacto</span>
