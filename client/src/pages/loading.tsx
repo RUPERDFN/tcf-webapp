@@ -9,34 +9,41 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function LoadingPage() {
   const [, setLocation] = useLocation();
-  const onboardingData = useOnboardingStore();
+  const { data } = useOnboardingStore();
   const { setMenu, setShoppingList } = useDashboardStore();
   const { toast } = useToast();
-  const [status, setStatus] = useState('Talking to the Chef...');
+  const [status, setStatus] = useState('Hablando con el Chef...');
 
   useEffect(() => {
     const generate = async () => {
       try {
-        setStatus('Curating recipes...');
-        // menuAPI.generate expects "profile" object. onboardingData IS the profile structure roughly.
-        await menuAPI.generate(onboardingData, onboardingData.days);
+        setStatus('Seleccionando recetas...');
         
-        setStatus('Planning your week...');
+        const profile = {
+          budget_eur_week: data.budgetWeekly,
+          diners: data.diners,
+          meals_per_day: data.mealsPerDay,
+          days: data.daysPerWeek,
+          diet_type: data.dietType,
+          allergies: data.allergies,
+          disliked_foods: data.dislikes,
+          pantry_items: data.pantryItems.join(', '),
+        };
+        
+        await menuAPI.generate(profile, data.daysPerWeek);
+        
+        setStatus('Planificando tu semana...');
         const menuRes = await menuAPI.getLatest();
         setMenu(menuRes.data);
 
-        setStatus('Writing shopping list...');
+        setStatus('Creando lista de compra...');
         const shopRes = await shoppingAPI.getLatest();
         setShoppingList(shopRes.data);
-        
-        // Finalize (Mock save calls if needed, or already handled by generate flow in real backend)
-        // Since we are mocking, menuAPI.generate returns data but getLatest fetches it. 
-        // In our mock api.ts, getLatest returns static data.
         
         setTimeout(() => setLocation('/dashboard'), 1000);
       } catch (error) {
         console.error(error);
-        toast({ title: "Error", description: "Chef burned the food. Try again.", variant: "destructive" });
+        toast({ title: "Error", description: "El chef quemó la comida. Inténtalo de nuevo.", variant: "destructive" });
         setLocation('/onboarding/1');
       }
     };
@@ -56,7 +63,7 @@ export default function LoadingPage() {
         
         <div className="space-y-2">
           <h2 className="text-3xl font-display animate-pulse text-white">{status}</h2>
-          <p className="text-muted-foreground">This might take a few seconds.</p>
+          <p className="text-muted-foreground">Esto puede tardar unos segundos.</p>
         </div>
       </div>
     </Layout>

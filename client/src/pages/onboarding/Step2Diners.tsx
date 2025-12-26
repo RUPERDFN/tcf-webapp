@@ -4,12 +4,18 @@ import { Button } from '@/components/ui/button';
 
 export default function Step2Diners() {
   const [, setLocation] = useLocation();
-  const { diners, setField } = useOnboardingStore();
+  const { data, updateData, nextStep, prevStep } = useOnboardingStore();
 
   const handleNext = () => {
-    if (diners >= 1 && diners <= 20) {
+    if (data.diners >= 1 && data.diners <= 10) {
+      nextStep();
       setLocation('/onboarding/3');
     }
+  };
+
+  const handleBack = () => {
+    prevStep();
+    setLocation('/onboarding/1');
   };
 
   return (
@@ -32,34 +38,37 @@ export default function Step2Diners() {
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <button
               key={num}
-              onClick={() => setField('diners', num)}
-              className={`number-selector ${diners === num ? 'selected' : ''}`}
+              onClick={() => updateData({ diners: num })}
+              className={`number-selector ${data.diners === num ? 'selected' : ''}`}
+              data-testid={`button-diners-${num}`}
             >
               {num}
             </button>
           ))}
         </div>
         <p className="text-gray-400 text-sm mt-4 text-center">
-          También puedes escribir un número
+          También puedes escribir un número (máx. 10)
         </p>
         <input
           type="number"
           className="input-tcf mt-2 text-center font-bold"
           placeholder="Ej: 4"
-          value={diners || ''}
-          onChange={(e) => setField('diners', parseInt(e.target.value) || 0)}
+          value={data.diners || ''}
+          onChange={(e) => updateData({ diners: parseInt(e.target.value) || 0 })}
           min={1}
-          max={20}
+          max={10}
+          data-testid="input-diners"
         />
       </div>
 
       <div className="flex justify-between">
-        <Button variant="outline" onClick={() => setLocation('/onboarding/1')}>
+        <Button variant="outline" onClick={handleBack} data-testid="button-back">
           Atrás
         </Button>
         <Button 
           onClick={handleNext}
-          disabled={diners < 1 || diners > 20}
+          disabled={data.diners < 1 || data.diners > 10}
+          data-testid="button-next"
         >
           Siguiente
         </Button>
