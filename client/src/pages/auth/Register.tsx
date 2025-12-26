@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useLocation, Link } from 'wouter';
 import { useAuthStore } from '../../lib/stores/authStore';
 import { authAPI } from '../../lib/api';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import toast from 'react-hot-toast';
 
 export default function Register() {
@@ -38,24 +39,34 @@ export default function Register() {
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-6">
-          <Input
-            type="email"
-            label="Email"
-            placeholder="tu@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <Input
-            type="password"
-            label="Contraseña"
-            placeholder="Mínimo 8 caracteres"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={8}
-          />
-          <Button type="submit" className="w-full" disabled={loading}>
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-white">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="tu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="input-tcf"
+              data-testid="input-email"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-white">Contraseña</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Mínimo 8 caracteres"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+              className="input-tcf"
+              data-testid="input-password"
+            />
+          </div>
+          <Button type="submit" className="w-full btn-siguiente" disabled={loading} data-testid="button-submit">
             {loading ? 'Creando cuenta...' : 'Empezar gratis'}
           </Button>
         </form>
@@ -63,7 +74,7 @@ export default function Register() {
         <p className="text-center mt-6 text-gray-300">
           ¿Ya tienes cuenta?{' '}
           <Link href="/login">
-             <span className="text-accent-green hover:underline cursor-pointer">
+             <span className="text-accent-green hover:underline cursor-pointer" data-testid="link-login">
                 Iniciar sesión
              </span>
           </Link>
